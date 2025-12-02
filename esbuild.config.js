@@ -2,18 +2,17 @@ const esbuild = require('esbuild');
 
 const buildOptions = {
   entryPoints: ['src/index.ts'],
-  bundle: true,
+  bundle: true, // don't bundle, just transpile
   outfile: 'dist/index.js',
   platform: 'node',
-  target: 'node16',
+  target: 'node20',
   format: 'cjs',
   sourcemap: true,
-  minify: false,
-  external: [],
+  minify: true,
+  external: ['playwright', 'playwright-core'], // exclude playwright modules from bundle to avoid resolution issues
 };
 
-// Build function
-const build = async () => {
+async function build() {
   try {
     await esbuild.build(buildOptions);
     console.log('Build completed successfully!');
@@ -21,24 +20,11 @@ const build = async () => {
     console.error('Build failed:', error);
     process.exit(1);
   }
-};
-
-// Watch function for development
-const watch = async () => {
-  const ctx = await esbuild.context(buildOptions);
-  await ctx.watch();
-  console.log('Watching for changes...');
-};
-
-// Export for use in package.json scripts
-module.exports = { build, watch, buildOptions };
-
-// Run build if this file is executed directly
-if (require.main === module) {
-  const args = process.argv.slice(2);
-  if (args.includes('--watch')) {
-    watch();
-  } else {
-    build();
-  }
 }
+
+// When run via `node esbuild.config.js`
+if (require.main === module) {
+  build();
+}
+
+module.exports = { buildOptions, build };

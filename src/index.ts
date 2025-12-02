@@ -14,3 +14,6 @@ import { openPage } from './scrape';
 export const main = async (): Promise<void> => {
   await openPage('https://example.com');
 };
+
+main().catch(console.error);
+
