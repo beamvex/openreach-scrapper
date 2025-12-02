@@ -6,6 +6,9 @@ export const openPage = async (url: string): Promise<void> => {
 
   await page.goto(url, { waitUntil: 'networkidle' });
 
+  const elements = await page.$$('input');
+  console.log('Found input elements:', elements.length);
+
   // Wait a bit to see the page
   await page.waitForTimeout(5000);
 

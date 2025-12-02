@@ -12,7 +12,7 @@ export const handler = async (
 import { openPage } from './scrape';
 
 export const main = async (): Promise<void> => {
-  await openPage('https://example.com');
+  await openPage('https://www.openreach.com/');
 };
 
 main().catch(console.error);
