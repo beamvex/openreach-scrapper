@@ -1,7 +1,7 @@
 import { chromium } from 'playwright';
 
 export const openPage = async (url: string): Promise<void> => {
-  const browser = await chromium.launch({ headless: true, devtools: true });
+  const browser = await chromium.launch({ headless: false, devtools: true });
   const page = await browser.newPage();
 
   await page.goto(url, { waitUntil: 'networkidle' });
@@ -9,16 +9,13 @@ export const openPage = async (url: string): Promise<void> => {
   const elements = await page.$$('input');
   console.log('Found input elements:', elements.length);
 
-  // Log details of each input element
-  for (let i = 0; i < elements.length; i++) {
-    const tagName = await elements[i].evaluate(el => el.tagName);
-    const type = await elements[i].evaluate(el => el.getAttribute('type'));
-    const placeholder = await elements[i].evaluate(el => el.getAttribute('placeholder'));
-    console.log(`Input ${i + 1}: tag=${tagName}, type=${type}, placeholder=${placeholder}`);
-  }
+  const postcodeInput = page.getByPlaceholder(/postcode/i).first();
+  await postcodeInput.waitFor({ state: 'visible' });
+  await postcodeInput.fill('SW1A 1AA');
+  console.log('Filled postcode input with SW1A 1AA');
 
   // Wait a bit to see the page
-  //await page.waitForTimeout(5000);
+  await page.waitForTimeout(60000);
 
   await browser.close();
 };
