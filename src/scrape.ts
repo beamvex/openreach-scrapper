@@ -18,7 +18,7 @@ export const openPage = async (url: string): Promise<void> => {
 
       // If this is the postcode input, "type" into it here
       if (input.type === 'text') {
-        const text = 'SW1A 1AA';
+        const text = 'LN4 2EH';
 
         input.focus();
         input.value = text;
@@ -44,17 +44,26 @@ export const openPage = async (url: string): Promise<void> => {
   console.log('Found button elements:', buttons.length);
 
   for (const button of buttons) {
-    const buttonInfo = await button.evaluate(el => ({
-      tagName: el.tagName,
-      type: (el as HTMLButtonElement).type,
-      text: (el as HTMLButtonElement).textContent?.trim() || '',
-    }));
+    const buttonInfo = await button.evaluate(el => {
+
+      console.log('Button text: ', el.textContent?.trim());
+      if (el.textContent?.trim() === 'Check postcode') {
+        console.log('Clicking button');
+        el.click();
+      }
+
+      return {
+        tagName: el.tagName,
+        type: (el as HTMLButtonElement).type,
+        text: (el as HTMLButtonElement).textContent?.trim() || '',
+      };
+    });
+
     console.log('Button: ', JSON.stringify(buttonInfo, null, 2));
   }
 
-
   // Wait a bit to see the page
-  await page.waitForTimeout(25000);
+  await page.waitForTimeout(65000);
 
   await browser.close();
 };
