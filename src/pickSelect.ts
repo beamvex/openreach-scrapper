@@ -1,8 +1,8 @@
 import { Page } from "playwright";
 import { Criteria } from "./criteria";
-import { clickButton } from "./clickButton";
+import { ElementInfo } from "./ElementInfo";
 
-export async function pickSelect(page: Page, criteria: Criteria, fillText: string) {
+export async function pickSelect(page: Page, criteria: Criteria, fillText: string): Promise<ElementInfo | undefined> {
     const elements = await page.$$(criteria.selector ?? 'select');
     console.log('Found select elements:', elements.length);
 
@@ -34,7 +34,7 @@ export async function pickSelect(page: Page, criteria: Criteria, fillText: strin
                 select.dispatchEvent(new Event('change', { bubbles: true }));
             }
 
-            const result = {
+            const result: ElementInfo = {
                 tagName: el.tagName,
                 class: el.className,
                 type: select.type,
@@ -45,14 +45,20 @@ export async function pickSelect(page: Page, criteria: Criteria, fillText: strin
                     value: option.value,
                     text: option.text,
                     selected: option.selected
-                }))
+                })),
+                targetIndex,
+
             };
 
             return result;
         }, { criteria, fillText });
 
-
-
         console.log('Select: ', JSON.stringify(elementInfo, null, 2));
+
+        if (elementInfo.targetIndex > 0) {
+            return elementInfo;
+        }
     }
+
+    return undefined;
 }

@@ -21,16 +21,29 @@ export const openPage = async (url: string): Promise<void> => {
     // Wait a bit to see the page
     await page.waitForTimeout(2500);
 
-    await pickSelect(page, {}, '');
+    const elementInfo = await pickSelect(page, {}, '');
 
-    await clickButton(page, { textContent: 'Check availability' });
+    // Wait a bit to see the page
+    await page.waitForTimeout(1000);
+
+    if (elementInfo) {
+      console.log('Element info: ', JSON.stringify(elementInfo, null, 2));
+
+      await clickButton(page, { textContent: 'Check availability' });
+
+    }
 
     // Wait a bit to see the page
     await page.waitForTimeout(5000);
 
-    // dump current html
-    const html = await page.content();
-    fs.writeFileSync('./tmp/page.html', html);
+    if (elementInfo) {
+
+      const selectedOptions = elementInfo.options[elementInfo.targetIndex];
+      console.log('Selected options: ', JSON.stringify(selectedOptions, null, 2));
+      // dump current html
+      const html = await page.content();
+      fs.writeFileSync(`./tmp/page-${selectedOptions.text}.html`, html);
+    }
 
   } finally {
     await browser.close();
