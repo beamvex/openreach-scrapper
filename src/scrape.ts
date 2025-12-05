@@ -1,6 +1,7 @@
 import { chromium } from 'playwright';
 import { fillInput } from './fillInput';
 import { clickButton } from './clickButton';
+import fs from 'fs';
 
 export const openPage = async (url: string): Promise<void> => {
   const browser = await chromium.launch({ headless: false, devtools: true });
@@ -17,7 +18,11 @@ export const openPage = async (url: string): Promise<void> => {
     await clickButton(page, { textContent: 'Check postcode' });
 
     // Wait a bit to see the page
-    await page.waitForTimeout(5000);
+    await page.waitForTimeout(2500);
+
+    // dump current html
+    const html = await page.content();
+    fs.writeFileSync('page.html', html);
 
   } finally {
     await browser.close();
