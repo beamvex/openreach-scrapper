@@ -1,8 +1,33 @@
 import { chromium } from 'playwright';
 import { fillInput } from './fillInput';
 import { clickButton } from './clickButton';
-import fs from 'fs';
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { pickSelect } from './pickSelect';
+
+const s3Region = process.env.S3_REGION ?? process.env.AWS_REGION;
+const s3Bucket = process.env.S3_BUCKET_NAME;
+
+const s3Client = s3Region
+  ? new S3Client({ region: s3Region })
+  : undefined;
+
+async function uploadHtmlToS3(key: string, html: string): Promise<void> {
+  if (!s3Bucket) {
+    throw new Error('S3_BUCKET_NAME environment variable is not set');
+  }
+  if (!s3Client) {
+    throw new Error('S3_REGION or AWS_REGION environment variable is not set');
+  }
+
+  const command = new PutObjectCommand({
+    Bucket: s3Bucket,
+    Key: key,
+    Body: html,
+    ContentType: 'text/html; charset=utf-8',
+  });
+
+  await s3Client.send(command);
+}
 
 export const openPage = async (url: string): Promise<void> => {
   const browser = await chromium.launch({ headless: false, devtools: true });
@@ -40,9 +65,14 @@ export const openPage = async (url: string): Promise<void> => {
 
       const selectedOptions = elementInfo.options[elementInfo.targetIndex];
       console.log('Selected options: ', JSON.stringify(selectedOptions, null, 2));
-      // dump current html
+
       const html = await page.content();
-      fs.writeFileSync(`./tmp/page-${selectedOptions.text}.html`, html);
+
+      const safeName = selectedOptions.text.replace(/[^a-zA-Z0-9_-]+/g, '_');
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+      const key = `openreach/${safeName}-${timestamp}.html`;
+
+      await uploadHtmlToS3(key, html);
     }
 
   } finally {
