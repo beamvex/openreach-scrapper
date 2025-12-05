@@ -1,3 +1,4 @@
+import { Page } from "playwright";
 import { Criteria } from "./criteria";
 
 export async function fillInput(page: Page, criteria: Criteria, fillText: string) {
@@ -5,7 +6,7 @@ export async function fillInput(page: Page, criteria: Criteria, fillText: string
   console.log('Found input elements:', elements.length);
 
   for (const element of elements) {
-    const elementInfo = await element.evaluate(el => {
+    const elementInfo = await element.evaluate((el: HTMLElement, { criteria, fillText }: { criteria: Criteria, fillText: string }) => {
       const input = el as HTMLInputElement;
 
       // If this is the postcode input, "type" into it here
@@ -28,7 +29,7 @@ export async function fillInput(page: Page, criteria: Criteria, fillText: string
         value: (el as HTMLInputElement).value,
         name: (el as HTMLInputElement).name,
       };
-    });
+    }, { criteria, fillText });
 
     console.log('Input: ', JSON.stringify(elementInfo, null, 2));
   }
