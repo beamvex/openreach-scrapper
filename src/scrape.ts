@@ -7,9 +7,7 @@ import { pickSelect } from './pickSelect';
 const s3Region = process.env.S3_REGION ?? process.env.AWS_REGION;
 const s3Bucket = process.env.S3_BUCKET_NAME;
 
-const s3Client = s3Region
-  ? new S3Client({ region: s3Region })
-  : undefined;
+const s3Client = s3Region ? new S3Client({ region: s3Region }) : undefined;
 
 async function uploadHtmlToS3(key: string, html: string): Promise<void> {
   if (!s3Bucket) {
@@ -39,7 +37,11 @@ export const openPage = async (url: string): Promise<void> => {
     // Wait a bit to see the page
     await page.waitForTimeout(2000);
 
-    await fillInput(page, { type: 'text', className: 'postcode-checker__input' }, 'LN4 2EH');
+    await fillInput(
+      page,
+      { type: 'text', className: 'postcode-checker__input' },
+      'LN4 2EH'
+    );
 
     await clickButton(page, { textContent: 'Check postcode' });
 
@@ -55,16 +57,17 @@ export const openPage = async (url: string): Promise<void> => {
       console.log('Element info: ', JSON.stringify(elementInfo, null, 2));
 
       await clickButton(page, { textContent: 'Check availability' });
-
     }
 
     // Wait a bit to see the page
     await page.waitForTimeout(5000);
 
     if (elementInfo) {
-
       const selectedOptions = elementInfo.options[elementInfo.targetIndex];
-      console.log('Selected options: ', JSON.stringify(selectedOptions, null, 2));
+      console.log(
+        'Selected options: ',
+        JSON.stringify(selectedOptions, null, 2)
+      );
 
       const html = await page.content();
 
@@ -74,11 +77,7 @@ export const openPage = async (url: string): Promise<void> => {
 
       await uploadHtmlToS3(key, html);
     }
-
   } finally {
     await browser.close();
   }
 };
-
-
-

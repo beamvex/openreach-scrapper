@@ -30,7 +30,7 @@ resource "aws_ecr_repository" "openreach_scrapper" {
 
 resource "null_resource" "build_and_push_image" {
   triggers = {
-    image_tag = "latest"
+    always = timestamp()
   }
 
   provisioner "local-exec" {
