@@ -22,6 +22,7 @@ RUN . ~/.profile && echo npx playwright install-deps
 USER root
 RUN chown -R sbx_user1051:sbx_user1051 /app
 RUN chmod +x /app
+RUN mkdir -p /home/sbx_user1051 && chown -R sbx_user1051:990 /home/sbx_user1051   
 
 # Copy package metadata and install dependencies (including aws-lambda-ric)
 #COPY package*.json ./
