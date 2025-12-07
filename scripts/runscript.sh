@@ -1,4 +1,4 @@
 #!/bin/bash
-. /root/.bashrc
+. ~/.profile
 whoami
 echo $@
