@@ -38,7 +38,7 @@ resource "null_resource" "build_and_push_image" {
 aws ecr get-login-password --region eu-west-2 \
   | docker login --username AWS --password-stdin ${aws_ecr_repository.openreach_scrapper.repository_url}
 
-DOCKER_BUILDKIT=0 docker build -t openreach-scrapper ..
+DOCKER_BUILDKIT=1 docker build --platform linux/amd64 --provenance=false -t openreach-scrapper ..
 docker tag openreach-scrapper:latest ${aws_ecr_repository.openreach_scrapper.repository_url}:latest
 docker push ${aws_ecr_repository.openreach_scrapper.repository_url}:latest
 EOT
@@ -46,6 +46,7 @@ EOT
 }
 
 resource "aws_lambda_function" "openreach_scrapper" {
+  
   function_name = "openreach-scrapper"
   role          = aws_iam_role.lambda_exec_role.arn
   package_type  = "Image"
