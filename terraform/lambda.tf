@@ -38,7 +38,7 @@ resource "null_resource" "build_and_push_image" {
 aws ecr get-login-password --region eu-west-2 \
   | docker login --username AWS --password-stdin ${aws_ecr_repository.openreach_scrapper.repository_url}
 
-docker build -t openreach-scrapper ..
+DOCKER_BUILDKIT=0 docker build -t openreach-scrapper ..
 docker tag openreach-scrapper:latest ${aws_ecr_repository.openreach_scrapper.repository_url}:latest
 docker push ${aws_ecr_repository.openreach_scrapper.repository_url}:latest
 EOT
