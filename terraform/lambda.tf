@@ -35,6 +35,8 @@ resource "null_resource" "build_and_push_image" {
 
   provisioner "local-exec" {
     command = <<EOT
+npm run build
+
 aws ecr get-login-password --region eu-west-2 \
   | docker login --username AWS --password-stdin ${aws_ecr_repository.openreach_scrapper.repository_url}
 
@@ -51,7 +53,8 @@ resource "aws_lambda_function" "openreach_scrapper" {
   role          = aws_iam_role.lambda_exec_role.arn
   package_type  = "Image"
   image_uri     = "${aws_ecr_repository.openreach_scrapper.repository_url}:latest"
-
+  timeout       = 60
+  memory_size   = 1024
   depends_on = [null_resource.build_and_push_image]
 
   architectures = ["x86_64"]

@@ -28,7 +28,7 @@ async function uploadHtmlToS3(key: string, html: string): Promise<void> {
 }
 
 export const openPage = async (url: string): Promise<void> => {
-  const browser = await chromium.launch({ headless: false, devtools: true });
+  const browser = await chromium.launch({ headless: true, devtools: false });
   const page = await browser.newPage();
 
   try {
