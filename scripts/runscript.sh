@@ -8,7 +8,7 @@ whoami
 export XDG_CACHE_HOME=/tmp/.cache
 mkdir -p "$XDG_CACHE_HOME"
 
-/ms-playwright/chromium-1200/chrome-linux64/chrome --no-sandbox --disable-setuid-sandbox --disable-dev-shm-usage --headless --disable-gpu
+chromium --no-sandbox --disable-setuid-sandbox --disable-dev-shm-usage --headless --disable-gpu --disable-crash-reporter --no-crashpad
 
 #node --enable-source-maps dist/index.js
 
