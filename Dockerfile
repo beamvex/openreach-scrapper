@@ -1,13 +1,19 @@
-FROM mcr.microsoft.com/playwright:v1.57.0-noble
+FROM debian:trixie
 
 WORKDIR /app
 
-RUN npm install -S playwright
+RUN apt update
+RUN apt install -y \
+    curl \
+    git \
+    chromium
+
+#RUN npm install -S playwright
 
 COPY ./dist /app/dist
 COPY ./scripts /app/
 
-RUN groupadd -g 990 sbx_user1051
+#RUN groupadd -g 990 sbx_user1051
 RUN useradd -m -s /bin/bash -u 1002 -g 990 sbx_user1051
 
 
