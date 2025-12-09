@@ -1,15 +1,15 @@
 #!/bin/bash
 
+echo wtf
+
 whoami
 
-ls -la /
+# Use /tmp for all cache (incl. fontconfig)
+export XDG_CACHE_HOME=/tmp/.cache
+mkdir -p "$XDG_CACHE_HOME"
 
-ls -la ~/
+/ms-playwright/chromium-1200/chrome-linux64/chrome --no-sandbox --disable-setuid-sandbox --disable-dev-shm-usage --headless --disable-gpu
 
-ls -la /app/
+#node --enable-source-maps dist/index.js
 
-ls -la /home/
-
-ls -la /ms-playwright/chromium-1200/chrome-linux64/
-
-touch ~/poo
+#find /tmp/
