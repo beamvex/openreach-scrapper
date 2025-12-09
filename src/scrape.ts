@@ -28,7 +28,17 @@ async function uploadHtmlToS3(key: string, html: string): Promise<void> {
 }
 
 export const openPage = async (url: string): Promise<void> => {
-  const browser = await chromium.launch({ headless: true, devtools: false });
+  console.log('Launching Chromium...');
+  const browser = await chromium.launch({
+    headless: true,
+    devtools: false,
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+    ],
+  });
+  console.log('Chromium launched, creating new page...');
   const page = await browser.newPage();
 
   try {
@@ -79,5 +89,6 @@ export const openPage = async (url: string): Promise<void> => {
     }
   } finally {
     await browser.close();
+    console.log('Chromium closed');
   }
 };

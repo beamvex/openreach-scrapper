@@ -54,7 +54,7 @@ resource "aws_lambda_function" "openreach_scrapper" {
   package_type  = "Image"
   image_uri     = "${aws_ecr_repository.openreach_scrapper.repository_url}:latest"
   timeout       = 60
-  memory_size   = 1024
+  memory_size   = 512
   depends_on = [null_resource.build_and_push_image]
 
   architectures = ["x86_64"]
