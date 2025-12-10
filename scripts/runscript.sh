@@ -17,7 +17,7 @@ mkdir -p "$XDG_CONFIG_HOME"
 
    
 
-/opt/chrome/chrome-linux64/chrome --no-sandbox --disable-setuid-sandbox --disable-dev-shm-usage --headless --disable-gpu --disable-crash-reporter --no-crashpad
+chromium --no-sandbox --disable-setuid-sandbox --disable-dev-shm-usage --headless --disable-gpu --disable-crash-reporter --no-crashpad
 
 #node --enable-source-maps dist/index.js
 
