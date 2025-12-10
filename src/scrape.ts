@@ -29,14 +29,8 @@ async function uploadHtmlToS3(key: string, html: string): Promise<void> {
 
 export const openPage = async (url: string): Promise<void> => {
   console.log('Launching Chromium...');
-  const browser = await chromium.launch({
-    headless: true,
-    devtools: false,
-    args: [
-      '--no-sandbox',
-      '--disable-setuid-sandbox',
-      '--disable-dev-shm-usage',
-    ],
+  const browser = await chromium.connectOverCDP({
+    wsEndpoint: 'http://localhost:9222',
   });
   console.log('Chromium launched, creating new page...');
   const page = await browser.newPage();

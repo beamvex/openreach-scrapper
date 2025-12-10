@@ -27,8 +27,10 @@ chromium \
   --remote-debugging-port=9222 \
   about:blank &
 
-#node --enable-source-maps dist/index.js
-sleep 30
+sleep 11
+
+node --enable-source-maps dist/index.js
+#sleep 30
 
 killall chromium
 #find /tmp/
