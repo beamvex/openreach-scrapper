@@ -17,7 +17,17 @@ mkdir -p "$XDG_CONFIG_HOME"
 
    
 
-chromium --no-sandbox --disable-setuid-sandbox --disable-dev-shm-usage --headless --disable-gpu --disable-crash-reporter --no-crashpad
+chromium \
+  --headless=new \
+  --no-sandbox \
+  --disable-setuid-sandbox \
+  --disable-dev-shm-usage \
+  --disable-gpu \
+  --disable-gpu-sandbox \
+  --no-zygote \
+  --disable-crash-reporter \
+  --no-crashpad \
+  about:blank
 
 #node --enable-source-maps dist/index.js
 
