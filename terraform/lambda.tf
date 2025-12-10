@@ -24,6 +24,11 @@ resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
+resource "aws_iam_role_policy_attachment" "lambda_s3" {
+  role       = aws_iam_role.lambda_exec_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+}
+
 resource "aws_ecr_repository" "openreach_scrapper" {
   name = "openreach-scrapper"
 }
@@ -60,6 +65,9 @@ resource "aws_lambda_function" "openreach_scrapper" {
   architectures = ["x86_64"]
 
   environment {
-    variables = {}
+    variables = {
+      S3_BUCKET_NAME = "openreach-scrapper"
+      S3_REGION = "eu-west-2"
+    }
   }
 }

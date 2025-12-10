@@ -3,6 +3,7 @@ import { fillInput } from './fillInput';
 import { clickButton } from './clickButton';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { pickSelect } from './pickSelect';
+import fs from 'fs';
 
 const s3Region = process.env.S3_REGION ?? process.env.AWS_REGION;
 const s3Bucket = process.env.S3_BUCKET_NAME;
@@ -22,6 +23,24 @@ async function uploadHtmlToS3(key: string, html: string): Promise<void> {
     Key: key,
     Body: html,
     ContentType: 'text/html; charset=utf-8',
+  });
+
+  await s3Client.send(command);
+}
+
+async function uploadToS3(key: string, filePath: string): Promise<void> {
+  if (!s3Bucket) {
+    throw new Error('S3_BUCKET_NAME environment variable is not set');
+  }
+  if (!s3Client) {
+    throw new Error('S3_REGION or AWS_REGION environment variable is not set');
+  }
+
+  const command = new PutObjectCommand({
+    Bucket: s3Bucket,
+    Key: key,
+    Body: fs.createReadStream(filePath),
+    ContentType: 'image/png',
   });
 
   await s3Client.send(command);
@@ -86,15 +105,25 @@ export const openPage = async (url: string): Promise<void> => {
         'Selected options: ',
         JSON.stringify(selectedOptions, null, 2)
       );
-
-      const html = await page.content();
-
-      const safeName = selectedOptions.text.replace(/[^a-zA-Z0-9_-]+/g, '_');
-      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-      const key = `openreach/${safeName}-${timestamp}.html`;
-
-      await uploadHtmlToS3(key, html);
     }
+
+    const html = await page.content();
+
+    const safeName = 'test'; //selectedOptions.text.replace(/[^a-zA-Z0-9_-]+/g, '_');
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const key = `openreach/${safeName}-${timestamp}.html`;
+
+    await uploadHtmlToS3(key, html);
+
+    console.log('HTML uploaded to S3');
+
+    await page.screenshot({
+      path: `/tmp/openreach/${safeName}-${timestamp}.png`,
+    });
+
+    console.log('Screenshot taken');
+
+    await uploadToS3(key, `/tmp/openreach/${safeName}-${timestamp}.png`);
   } finally {
     await browser.close();
     console.log('Chromium closed');
