@@ -14,7 +14,9 @@ mkdir -p "$XDG_CACHE_HOME"
 mkdir -p "$XDG_DATA_HOME"
 mkdir -p "$XDG_CONFIG_HOME"
 
-chromium \
+echo "starting chromium"
+
+nohup chromium \
   --headless=new \
   --no-sandbox \
   --disable-setuid-sandbox \
@@ -25,12 +27,12 @@ chromium \
   --disable-crash-reporter \
   --no-crashpad \
   --remote-debugging-port=9222 \
-  about:blank &
+  about:blank > /tmp/custom.log 2>&1 &
 
+echo "chromium started"
+echo waiting 11 seconds
 sleep 11
 
 node --enable-source-maps dist/index.js
-#sleep 30
 
 killall chromium
-#find /tmp/

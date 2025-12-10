@@ -36,24 +36,37 @@ export const openPage = async (url: string): Promise<void> => {
   const page = await browser.newPage();
 
   try {
+    console.log('Navigating to ', url);
     await page.goto(url, { waitUntil: 'networkidle' });
+
+    console.log('Waiting for networkidle');
+    // Wait a bit to see the page
+    await page.waitForTimeout(12000);
+
+    console.log('Clicking button');
+    await clickButton(page, { type: 'submit', textContent: 'Reject all' });
 
     // Wait a bit to see the page
     await page.waitForTimeout(2000);
 
+    console.log('Filling input');
     await fillInput(
       page,
       { type: 'text', className: 'postcode-checker__input' },
       'LN4 2EH'
     );
 
+    console.log('Clicking button');
     await clickButton(page, { textContent: 'Check postcode' });
 
+    console.log('Waiting for 2.5 seconds');
     // Wait a bit to see the page
     await page.waitForTimeout(2500);
 
+    console.log('Picking select');
     const elementInfo = await pickSelect(page, {}, '');
 
+    console.log('Waiting for 1 second');
     // Wait a bit to see the page
     await page.waitForTimeout(1000);
 
@@ -63,6 +76,7 @@ export const openPage = async (url: string): Promise<void> => {
       await clickButton(page, { textContent: 'Check availability' });
     }
 
+    console.log('Waiting for 5 seconds');
     // Wait a bit to see the page
     await page.waitForTimeout(5000);
 
