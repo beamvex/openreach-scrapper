@@ -14,9 +14,6 @@ mkdir -p "$XDG_CACHE_HOME"
 mkdir -p "$XDG_DATA_HOME"
 mkdir -p "$XDG_CONFIG_HOME"
 
-
-   
-
 chromium \
   --headless=new \
   --no-sandbox \
@@ -27,8 +24,11 @@ chromium \
   --no-zygote \
   --disable-crash-reporter \
   --no-crashpad \
-  about:blank
+  --remote-debugging-port=9222 \
+  about:blank &
 
 #node --enable-source-maps dist/index.js
+sleep 30
 
+killall chromium
 #find /tmp/

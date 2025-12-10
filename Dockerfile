@@ -39,4 +39,4 @@ RUN npm install
 
 RUN npm run build
 
-ENTRYPOINT ["bash","/runscript.sh"]
+ENTRYPOINT ["bash","/app/runscript.sh"]
