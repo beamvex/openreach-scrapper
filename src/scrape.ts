@@ -1,10 +1,14 @@
-import { chromium } from 'playwright';
+import { chromium } from 'playwright-extra';
 import type { Page } from 'playwright';
 import { fillInput } from './fillInput';
 import { clickButton } from './clickButton';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { pickSelect } from './pickSelect';
 import fs from 'fs';
+
+const stealth = require('puppeteer-extra-plugin-stealth')()
+
+chromium.use(stealth)
 
 const s3Region = process.env.S3_REGION ?? process.env.AWS_REGION;
 const s3Bucket = process.env.S3_BUCKET_NAME;
