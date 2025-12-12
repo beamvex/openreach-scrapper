@@ -1,14 +1,14 @@
 import { chromium } from 'playwright-extra';
-import type { Page } from 'playwright';
+
 import { fillInput } from './fillInput';
 import { clickButton } from './clickButton';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { pickSelect } from './pickSelect';
 import fs from 'fs';
 
-const stealth = require('puppeteer-extra-plugin-stealth')()
+import stealth from 'puppeteer-extra-plugin-stealth';
 
-chromium.use(stealth)
+chromium.use(stealth);
 
 const s3Region = process.env.S3_REGION ?? process.env.AWS_REGION;
 const s3Bucket = process.env.S3_BUCKET_NAME;
@@ -31,32 +31,6 @@ async function uploadHtmlToS3(key: string, html: string): Promise<void> {
   });
 
   await s3Client.send(command);
-}
-
-async function applyStealth(page: Page): Promise<void> {
-  await page.addInitScript(() => {
-    try {
-      const anyGlobal = globalThis as Record<string, unknown>;
-
-      Object.defineProperty(anyGlobal.navigator as Navigator, 'webdriver', {
-        get: () => undefined,
-      });
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (anyGlobal as any).chrome = (anyGlobal as any).chrome || { runtime: {} };
-
-      Object.defineProperty(anyGlobal.navigator as Navigator, 'languages', {
-        get: () => ['en-GB', 'en'],
-      });
-
-      Object.defineProperty(anyGlobal.navigator as Navigator, 'plugins', {
-        get: () => [1, 2, 3],
-      });
-    } catch {
-      // Ignore stealth script errors to avoid breaking navigation
-      // console.debug('applyStealth init script error');
-    }
-  });
 }
 
 async function uploadToS3(key: string, filePath: string): Promise<void> {
@@ -84,8 +58,6 @@ export const openPage = async (url: string): Promise<void> => {
   });
   console.log('Chromium launched, creating new page...');
   const page = await browser.newPage();
-
-  await applyStealth(page);
 
   try {
     console.log('Navigating to ', url);
