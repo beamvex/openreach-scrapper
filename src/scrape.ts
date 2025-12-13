@@ -2,50 +2,7 @@ import { chromium } from 'playwright-extra';
 
 import { fillInput } from './fillInput';
 import { clickButton } from './clickButton';
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { pickSelect } from './pickSelect';
-import fs from 'fs';
-
-const s3Region = process.env.S3_REGION ?? process.env.AWS_REGION;
-const s3Bucket = process.env.S3_BUCKET_NAME;
-
-const s3Client = s3Region ? new S3Client({ region: s3Region }) : undefined;
-
-async function uploadHtmlToS3(key: string, html: string): Promise<void> {
-  if (!s3Bucket) {
-    throw new Error('S3_BUCKET_NAME environment variable is not set');
-  }
-  if (!s3Client) {
-    throw new Error('S3_REGION or AWS_REGION environment variable is not set');
-  }
-
-  const command = new PutObjectCommand({
-    Bucket: s3Bucket,
-    Key: key,
-    Body: html,
-    ContentType: 'text/html; charset=utf-8',
-  });
-
-  await s3Client.send(command);
-}
-
-async function uploadToS3(key: string, filePath: string): Promise<void> {
-  if (!s3Bucket) {
-    throw new Error('S3_BUCKET_NAME environment variable is not set');
-  }
-  if (!s3Client) {
-    throw new Error('S3_REGION or AWS_REGION environment variable is not set');
-  }
-
-  const command = new PutObjectCommand({
-    Bucket: s3Bucket,
-    Key: key,
-    Body: fs.createReadStream(filePath),
-    ContentType: 'image/png',
-  });
-
-  await s3Client.send(command);
-}
 
 export const openPage = async (url: string): Promise<void> => {
   console.log('Launching Chromium...');
@@ -54,6 +11,26 @@ export const openPage = async (url: string): Promise<void> => {
   });
   console.log('Chromium launched, creating new page...');
   const page = await browser.newPage();
+
+  page.on('console', async msg => {
+    const location = msg.location();
+    const locationStr = location.url
+      ? ` (${location.url}${location.lineNumber ? `:${location.lineNumber}` : ''}${location.columnNumber ? `:${location.columnNumber}` : ''})`
+      : '';
+
+    const values: string[] = [];
+    for (const arg of msg.args()) {
+      try {
+        const v = await arg.jsonValue();
+        values.push(typeof v === 'string' ? v : JSON.stringify(v));
+      } catch {
+        values.push('[unserializable]');
+      }
+    }
+
+    const text = values.length ? values.join(' ') : msg.text();
+    console.log(`[${msg.type()}] ${text}${locationStr}`);
+  });
 
   try {
     console.log('Navigating to ', url);
@@ -114,11 +91,11 @@ export const openPage = async (url: string): Promise<void> => {
       );
     }
 
-    const html = await page.content();
+    //const html = await page.content();
 
     const safeName = 'test'; //selectedOptions.text.replace(/[^a-zA-Z0-9_-]+/g, '_');
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-    const key = `openreach/${safeName}-${timestamp}.html`;
+    //const key = `openreach/${safeName}-${timestamp}.html`;
 
     //await uploadHtmlToS3(key, html);
 
