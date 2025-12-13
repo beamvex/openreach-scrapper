@@ -6,10 +6,6 @@ import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { pickSelect } from './pickSelect';
 import fs from 'fs';
 
-import stealth from 'puppeteer-extra-plugin-stealth';
-
-chromium.use(stealth);
-
 const s3Region = process.env.S3_REGION ?? process.env.AWS_REGION;
 const s3Bucket = process.env.S3_BUCKET_NAME;
 
@@ -77,7 +73,13 @@ export const openPage = async (url: string): Promise<void> => {
     await fillInput(
       page,
       { type: 'text', className: 'postcode-checker__input' },
-      'LN4 2EH'
+      'LN42EH'
+    );
+
+    await fillInput(
+      page,
+      { type: 'text', className: 'always-on-fibrechecker-input' },
+      'LN42EH'
     );
 
     console.log('Clicking button');
@@ -118,18 +120,18 @@ export const openPage = async (url: string): Promise<void> => {
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
     const key = `openreach/${safeName}-${timestamp}.html`;
 
-    await uploadHtmlToS3(key, html);
+    //await uploadHtmlToS3(key, html);
 
-    console.log('HTML uploaded to S3');
+    //console.log('HTML uploaded to S3');
 
     await page.screenshot({
       path: `/tmp/openreach/${safeName}-${timestamp}.png`,
     });
 
     console.log('Screenshot taken');
-    const pngKey = `openreach/${safeName}-${timestamp}.png`;
+    //const pngKey = `openreach/${safeName}-${timestamp}.png`;
 
-    await uploadToS3(pngKey, `/tmp/openreach/${safeName}-${timestamp}.png`);
+    // await uploadToS3(pngKey, `/tmp/openreach/${safeName}-${timestamp}.png`);
   } finally {
     await browser.close();
     console.log('Chromium closed');

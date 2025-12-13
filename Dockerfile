@@ -25,13 +25,15 @@ RUN chmod +x /app/runscript.sh
 
 COPY package.json /app/package.json
 COPY package-lock.json /app/package-lock.json
-
+COPY node_modules /app/node_modules
 #
+RUN chown -R sbx_user1051:sbx_user1051 /app 
 
 COPY src /app/src
 COPY esbuild.config.js /app/esbuild.config.js
+RUN chown -R sbx_user1051:sbx_user1051 /app/src 
+RUN chown -R sbx_user1051:sbx_user1051 /app/esbuild.config.js 
 
-RUN chown -R sbx_user1051:sbx_user1051 /app 
 
 USER sbx_user1051
 

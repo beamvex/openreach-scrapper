@@ -1,2 +1,2 @@
 #!/bin/bash
-docker run --rm -it --read-only --tmpfs /tmp openreach-scrapper:latest
+docker run --rm -it --read-only -v /tmp:/tmp openreach-scrapper:latest
