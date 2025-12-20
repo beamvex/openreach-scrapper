@@ -28,6 +28,6 @@ export async function clickButton(
       { criteria }
     );
 
-    console.log('Button: ', JSON.stringify(buttonInfo, null, 2));
+    //console.log('Button: ', JSON.stringify(buttonInfo, null, 2));
   }
 }

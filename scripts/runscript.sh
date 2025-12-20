@@ -17,7 +17,7 @@ mkdir -p "$XDG_CONFIG_HOME"
 echo "starting chromium"
 
 nohup chromium \
-  --headless=new \
+  --headless=no \
   --no-sandbox \
   --disable-setuid-sandbox \
   --disable-dev-shm-usage \
@@ -30,8 +30,8 @@ nohup chromium \
   about:blank > /tmp/custom.log 2>&1 &
 
 echo "chromium started"
-echo waiting 11 seconds
-sleep 11
+echo waiting 5 seconds
+sleep 5
 
 node --enable-source-maps dist/index.js
 

@@ -63,7 +63,7 @@ export async function pickSelect(
       { criteria, fillText }
     );
 
-    console.log('Select: ', JSON.stringify(elementInfo, null, 2));
+    //console.log('Select: ', JSON.stringify(elementInfo, null, 2));
 
     if (elementInfo.targetIndex > 0) {
       return elementInfo;

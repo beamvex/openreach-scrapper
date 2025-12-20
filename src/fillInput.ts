@@ -44,6 +44,6 @@ export async function fillInput(
       { criteria, fillText }
     );
 
-    console.log('Input: ', JSON.stringify(elementInfo, null, 2));
+    //console.log('Input: ', JSON.stringify(elementInfo, null, 2));
   }
 }
