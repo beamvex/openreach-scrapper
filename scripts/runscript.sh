@@ -6,8 +6,6 @@ sudo cat /proc/1/environ
 
 aws s3 ls
 
-exit
-
 whoami
 
 export DISPLAY=:1

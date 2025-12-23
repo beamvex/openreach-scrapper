@@ -5,7 +5,7 @@ const s3Region = process.env.S3_REGION ?? process.env.AWS_REGION;
 const s3Bucket = process.env.S3_BUCKET_NAME;
 const s3Client = s3Region ? new S3Client({ region: s3Region }) : undefined;
 
-async function uploadHtmlToS3(key: string, html: string): Promise<void> {
+export async function uploadHtmlToS3(key: string, html: string): Promise<void> {
   if (!s3Bucket) {
     throw new Error('S3_BUCKET_NAME environment variable is not set');
   }
@@ -23,7 +23,7 @@ async function uploadHtmlToS3(key: string, html: string): Promise<void> {
   await s3Client.send(command);
 }
 
-async function uploadToS3(key: string, filePath: string): Promise<void> {
+export async function uploadToS3(key: string, filePath: string): Promise<void> {
   if (!s3Bucket) {
     throw new Error('S3_BUCKET_NAME environment variable is not set');
   }

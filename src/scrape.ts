@@ -3,6 +3,7 @@ import { fillInput } from './fillInput';
 import { clickButton } from './clickButton';
 import { pickSelect } from './pickSelect';
 import * as fs from 'fs';
+import { uploadHtmlToS3, uploadToS3 } from './s3Region';
 
 export const openPage = async (url: string): Promise<void> => {
   console.log('Launching Chromium...');
@@ -81,20 +82,23 @@ export const openPage = async (url: string): Promise<void> => {
     const safeName = 'test'; //selectedOptions.text.replace(/[^a-zA-Z0-9_-]+/g, '_');
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
 
-    fs.writeFileSync(`/tmp/openreach/${safeName}-${timestamp}.html`, html);
+    //fs.writeFileSync(`/tmp/openreach/${safeName}-${timestamp}.html`, html);
 
-    //await uploadHtmlToS3(key, html);
+    await uploadHtmlToS3(`openreach/${safeName}-${timestamp}.html`, html);
 
     //console.log('HTML uploaded to S3');
 
+    fs.mkdirSync(`/config/openreach`, { recursive: true });
+
     await page.screenshot({
-      path: `/tmp/openreach/${safeName}-${timestamp}.png`,
+      path: `/config/openreach/${safeName}-${timestamp}.png`,
     });
 
     console.log('Screenshot taken');
-    //const pngKey = `openreach/${safeName}-${timestamp}.png`;
+    const pngKey = `openreach/${safeName}-${timestamp}.png`;
 
-    // await uploadToS3(pngKey, `/tmp/openreach/${safeName}-${timestamp}.png`);
+    await uploadToS3(pngKey, `/config/openreach/${safeName}-${timestamp}.png`);
+    console.log('Screenshot uploaded to S3');
   } finally {
     await browser.close();
     console.log('Chromium closed');

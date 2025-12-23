@@ -33,6 +33,10 @@ resource "aws_ecs_task_definition" "app" {
         {
           name  = "S6_KEEP_ENV"
           value = "1"
+        },
+        {
+          name  = "S3_BUCKET_NAME"
+          value = "openreach-scrapper"
         }
       ]
       logConfiguration = {
