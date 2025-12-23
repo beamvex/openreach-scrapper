@@ -72,33 +72,36 @@ export const openPage = async (url: string): Promise<void> => {
         'Selected options: ',
         JSON.stringify(selectedOptions, null, 2)
       );
+
+      // wait for ctrlc
+      await page.waitForTimeout(1000);
+
+      const html = await page.content();
+
+      const safeName = `${selectedOptions.text.replace(/[^a-zA-Z0-9_-]+/g, '_')}`;
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+
+      //fs.writeFileSync(`/tmp/openreach/${safeName}-${timestamp}.html`, html);
+
+      await uploadHtmlToS3(`openreach/${safeName}-${timestamp}.html`, html);
+
+      //console.log('HTML uploaded to S3');
+
+      fs.mkdirSync(`/config/openreach`, { recursive: true });
+
+      await page.screenshot({
+        path: `/config/openreach/${safeName}-${timestamp}.png`,
+      });
+
+      console.log('Screenshot taken');
+      const pngKey = `openreach/${safeName}-${timestamp}.png`;
+
+      await uploadToS3(
+        pngKey,
+        `/config/openreach/${safeName}-${timestamp}.png`
+      );
+      console.log('Screenshot uploaded to S3');
     }
-
-    // wait for ctrlc
-    await page.waitForTimeout(1000);
-
-    const html = await page.content();
-
-    const safeName = 'test'; //selectedOptions.text.replace(/[^a-zA-Z0-9_-]+/g, '_');
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-
-    //fs.writeFileSync(`/tmp/openreach/${safeName}-${timestamp}.html`, html);
-
-    await uploadHtmlToS3(`openreach/${safeName}-${timestamp}.html`, html);
-
-    //console.log('HTML uploaded to S3');
-
-    fs.mkdirSync(`/config/openreach`, { recursive: true });
-
-    await page.screenshot({
-      path: `/config/openreach/${safeName}-${timestamp}.png`,
-    });
-
-    console.log('Screenshot taken');
-    const pngKey = `openreach/${safeName}-${timestamp}.png`;
-
-    await uploadToS3(pngKey, `/config/openreach/${safeName}-${timestamp}.png`);
-    console.log('Screenshot uploaded to S3');
   } finally {
     await browser.close();
     console.log('Chromium closed');
