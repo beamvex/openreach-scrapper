@@ -23,6 +23,6 @@ resource "aws_security_group" "openreach-scrapper" {
 }
 
 output "security_group_id" {
-  value = aws_security_group.openreach-scrapper.id
+  value       = aws_security_group.openreach-scrapper.id
   description = "The ID of the security group"
 }

