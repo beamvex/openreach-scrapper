@@ -1,0 +1,2 @@
+#!/bin/sh
+/usr/lib/timebomb/time-bomb --no-sandbox --disable-dev-shm-usage $@
