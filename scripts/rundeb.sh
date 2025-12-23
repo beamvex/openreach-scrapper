@@ -1,4 +1,4 @@
 #!/bin/bash
-docker run --rm -it --read-only --tmpfs /tmp --entrypoint /bin/bash openreach-scrapper:latest
+bash ./builddocker.sh
 
-#docker run --rm -it --entrypoint /bin/bash openreach-scrapper:latest
+docker run --rm -it -p 3001:3001 openreach-scrapper:latest /bin/bash

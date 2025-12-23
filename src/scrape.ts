@@ -1,5 +1,4 @@
 import { chromium } from 'playwright-extra';
-import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 import { fillInput } from './fillInput';
 import { clickButton } from './clickButton';
 import { pickSelect } from './pickSelect';
@@ -7,7 +6,7 @@ import * as fs from 'fs';
 
 export const openPage = async (url: string): Promise<void> => {
   console.log('Launching Chromium...');
-  chromium.use(StealthPlugin());
+
   const browser = await chromium.connectOverCDP({
     wsEndpoint: 'http://localhost:9222',
   });
