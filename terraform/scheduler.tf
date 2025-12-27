@@ -76,7 +76,7 @@ resource "aws_scheduler_schedule" "openreach_scrapper" {
       network_configuration {
         subnets          = data.aws_subnets.default.ids
         security_groups  = [aws_security_group.openreach-scrapper.id]
-        assign_public_ip = "ENABLED"
+        assign_public_ip = true
       }
     }
   }
