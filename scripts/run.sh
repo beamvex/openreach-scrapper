@@ -6,5 +6,6 @@ docker run --rm -it -p 3001:3001 \
   -e AWS_PROFILE=512752756525_AdministratorAccess \
   -e S3_BUCKET_NAME=openreach-scrapper \
   -e S6_KEEP_ENV=1 \
+  -e AWS_REGION=eu-west-2 \
   -v ~/.aws:/config/.aws \
   openreach-scrapper:latest
