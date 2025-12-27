@@ -4,6 +4,7 @@ import { clickButton } from './clickButton';
 import { pickSelect } from './pickSelect';
 import * as fs from 'fs';
 import { uploadHtmlToS3, uploadToS3 } from './s3Region';
+import { postcodes } from './postcodes';
 
 export const openPage = async (url: string): Promise<void> => {
   console.log('Launching Chromium...');
@@ -32,15 +33,8 @@ export const openPage = async (url: string): Promise<void> => {
     await fillInput(
       page,
       { type: 'text', className: 'postcode-checker__input' },
-      'LN42EH'
+      postcodes[Math.floor(Math.random() * postcodes.length)]
     );
-
-    /*
-    await fillInput(
-      page,
-      { type: 'text', className: 'always-on-fibrechecker-input' },
-      'LN42EH'
-    );*/
 
     console.log('Clicking button check postcode');
     await clickButton(page, { textContent: 'Check postcode' });
