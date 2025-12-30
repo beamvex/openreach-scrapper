@@ -3,6 +3,7 @@ import { convertS3KeyToTimeAndLocation, parseS3Key } from '@/utils';
 import { timeAndLocation } from '@/utils';
 import { parseResults } from '@/parseResults';
 import { downloadS3Object, uploadHtmlToS3 } from '@/s3Region';
+import { geolocationData } from '@/geolocationdata';
 
 export const handler = async (event: unknown): Promise<void> => {
   console.log('Event: ', JSON.stringify(event, null, 2));
@@ -11,7 +12,21 @@ export const handler = async (event: unknown): Promise<void> => {
 
   const results: Record<
     string,
-    { timeAndLocation: timeAndLocation; status: string }
+    {
+      geolocation:
+        | {
+            Postcode: string;
+            Description: string;
+            'Grid Reference': string;
+            'X (easting)': number;
+            'Y (northing)': number;
+            Latitude: number;
+            Longitude: number;
+          }
+        | undefined;
+      timeAndLocation: timeAndLocation;
+      status: string;
+    }
   > = {};
 
   files
@@ -25,12 +40,14 @@ export const handler = async (event: unknown): Promise<void> => {
         results[result.postcode] = {
           timeAndLocation: result,
           status: '',
+          geolocation: undefined,
         };
       } else {
         if (result.time > results[result.postcode].timeAndLocation.time) {
           results[result.postcode] = {
             timeAndLocation: result,
             status: '',
+            geolocation: undefined,
           };
         }
       }
@@ -39,11 +56,15 @@ export const handler = async (event: unknown): Promise<void> => {
   for (const [postcode, result] of Object.entries(results)) {
     console.log(`Postcode: ${postcode}, Time: ${result.timeAndLocation.time}`);
 
+    const geolocation = geolocationData.find(
+      location => location.Postcode === postcode.replace(' ', '')
+    );
     const html = await downloadS3Object(result.timeAndLocation.key);
 
     const status = await parseResults(html);
     console.log(`Status: ${status}`);
     result.status = status;
+    result.geolocation = geolocation;
   }
 
   await uploadHtmlToS3('results.json', JSON.stringify(results));
