@@ -83,5 +83,5 @@ export async function downloadS3Object(key: string): Promise<string> {
     })
   );
 
-  return response.Body?.toString() ?? '';
+  return response.Body?.transformToString() ?? '';
 }

@@ -23,7 +23,7 @@ resource "aws_lambda_function" "process_results" {
   role             = aws_iam_role.lambda.arn
   handler          = "index.handler"
   runtime          = "nodejs18.x"
-  
+  timeout = 60
   filename         = data.archive_file.lambda.output_path
   source_code_hash = data.archive_file.lambda.output_base64sha256
   environment {

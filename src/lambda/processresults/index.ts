@@ -2,14 +2,17 @@ import { listS3Objects } from '@/s3Region';
 import { convertS3KeyToTimeAndLocation, parseS3Key } from '@/utils';
 import { timeAndLocation } from '@/utils';
 import { parseResults } from '@/parseResults';
-import { downloadS3Object } from '@/s3Region';
+import { downloadS3Object, uploadHtmlToS3 } from '@/s3Region';
 
 export const handler = async (event: unknown): Promise<void> => {
   console.log('Event: ', JSON.stringify(event, null, 2));
 
   const files = await listS3Objects('openreach/');
 
-  const results: Record<string, timeAndLocation> = {};
+  const results: Record<
+    string,
+    { timeAndLocation: timeAndLocation; status: string }
+  > = {};
 
   files
     .filter((file): file is string => file.endsWith('.html'))
@@ -19,21 +22,29 @@ export const handler = async (event: unknown): Promise<void> => {
     })
     .forEach(result => {
       if (!results[result.postcode]) {
-        results[result.postcode] = result;
+        results[result.postcode] = {
+          timeAndLocation: result,
+          status: '',
+        };
       } else {
-        if (result.time > results[result.postcode].time) {
-          results[result.postcode] = result;
+        if (result.time > results[result.postcode].timeAndLocation.time) {
+          results[result.postcode] = {
+            timeAndLocation: result,
+            status: '',
+          };
         }
       }
     });
 
-  console.log('Results: ', JSON.stringify(results, null, 2));
-
   for (const [postcode, result] of Object.entries(results)) {
-    console.log(`Postcode: ${postcode}, Time: ${result.time}`);
+    console.log(`Postcode: ${postcode}, Time: ${result.timeAndLocation.time}`);
 
-    const html = await downloadS3Object(result.key);
+    const html = await downloadS3Object(result.timeAndLocation.key);
+
     const status = await parseResults(html);
     console.log(`Status: ${status}`);
+    result.status = status;
   }
+
+  await uploadHtmlToS3('results.json', JSON.stringify(results));
 };
