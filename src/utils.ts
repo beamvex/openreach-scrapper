@@ -1,4 +1,5 @@
 export interface s3Parts {
+  key: string;
   street?: string;
   postcode1?: string;
   postcode2?: string;
@@ -14,6 +15,7 @@ export interface s3Parts {
 }
 
 export interface timeAndLocation {
+  key: string;
   time: Date;
   postcode: string;
 }
@@ -23,11 +25,15 @@ export function parseS3Key(key: string): s3Parts {
     /openreach\/(?<street>[^/]+)_(?<postcode1>[^/]+)_(?<postcode2>[^/]+)_(?<united>[^/]+)_(?<kingdom>[^/]+)-(?<year>[0-9]{4})-(?<month>[0-9]{2})-(?<day>[0-9]{2})T(?<hour>[0-9]{2})-(?<minute>[0-9]{2})-(?<second>[0-9]{2})-(?<millisecond>[0-9]{3})Z\.html/;
   const match = key.match(regex);
 
-  return match?.groups ?? ({} as s3Parts);
+  return {
+    key,
+    ...match?.groups,
+  };
 }
 
 export function convertS3KeyToTimeAndLocation(parts: s3Parts): timeAndLocation {
   return {
+    key: parts.key,
     time: new Date(
       parseInt(parts.year ?? '0'),
       parseInt(parts.month ?? '0') - 1,
