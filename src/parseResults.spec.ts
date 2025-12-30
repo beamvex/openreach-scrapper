@@ -8,6 +8,6 @@ describe('Parse Results', () => {
       'utf-8'
     );
     const result = parseResults(html);
-    expect(result).toBe('result');
+    expect(result).toBe('Available to order now');
   });
 });
