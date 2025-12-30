@@ -17,6 +17,7 @@ data "archive_file" "lambda" {
   depends_on  = [null_resource.build_src]
 }
 
+
 resource "aws_lambda_function" "process_results" {
   function_name    = "openreach-scrapper-process-results"
   role             = aws_iam_role.lambda.arn
@@ -24,7 +25,14 @@ resource "aws_lambda_function" "process_results" {
   runtime          = "nodejs18.x"
   
   filename         = data.archive_file.lambda.output_path
+  source_code_hash = data.archive_file.lambda.output_base64sha256
+  environment {
+    variables = {
+      S3_BUCKET_NAME = "openreach-scrapper"
+    }
+  }
 }
+
 
 resource "aws_iam_role" "lambda" {
   name = "openreach-scrapper-process-results-role"
@@ -46,4 +54,9 @@ resource "aws_iam_role" "lambda" {
 resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
   role       = aws_iam_role.lambda.name
   policy_arn  = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_s3_full_access" {
+  role       = aws_iam_role.lambda.name
+  policy_arn  = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
 }
