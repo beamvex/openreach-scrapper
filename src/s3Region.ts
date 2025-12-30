@@ -2,6 +2,7 @@ import {
   S3Client,
   PutObjectCommand,
   ListObjectsV2Command,
+  GetObjectCommand,
 } from '@aws-sdk/client-s3';
 import fs from 'fs';
 
@@ -65,4 +66,22 @@ export async function listS3Objects(prefix: string): Promise<Array<string>> {
       (key): key is string => typeof key === 'string'
     ) ?? []
   );
+}
+
+export async function downloadS3Object(key: string): Promise<string> {
+  if (!s3Bucket) {
+    throw new Error('S3_BUCKET_NAME environment variable is not set');
+  }
+  if (!s3Client) {
+    throw new Error('S3_REGION or AWS_REGION environment variable is not set');
+  }
+
+  const response = await s3Client.send(
+    new GetObjectCommand({
+      Bucket: s3Bucket,
+      Key: key,
+    })
+  );
+
+  return response.Body?.toString() ?? '';
 }
