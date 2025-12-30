@@ -1,9 +1,9 @@
 const esbuild = require('esbuild');
 
 const buildOptions = {
-  entryPoints: ['src/index.ts'],
+  entryPoints: ['src/index.ts', 'src/lambda/processresults/index.ts'],
   bundle: true, // don't bundle, just transpile
-  outfile: 'dist/index.js',
+  outdir: 'dist',
   platform: 'node',
   target: 'node20',
   format: 'cjs',
