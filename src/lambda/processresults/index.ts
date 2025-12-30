@@ -1,6 +1,8 @@
 import { listS3Objects } from '@/s3Region';
 import { convertS3KeyToTimeAndLocation, parseS3Key } from '@/utils';
 import { timeAndLocation } from '@/utils';
+import { parseResults } from '@/parseResults';
+import { downloadS3Object } from '@/s3Region';
 
 export const handler = async (event: unknown): Promise<void> => {
   console.log('Event: ', JSON.stringify(event, null, 2));
@@ -26,4 +28,12 @@ export const handler = async (event: unknown): Promise<void> => {
     });
 
   console.log('Results: ', JSON.stringify(results, null, 2));
+
+  for (const [postcode, result] of Object.entries(results)) {
+    console.log(`Postcode: ${postcode}, Time: ${result.time}`);
+
+    const html = await downloadS3Object(result.key);
+    const status = await parseResults(html);
+    console.log(`Status: ${status}`);
+  }
 };
