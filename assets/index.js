@@ -6,33 +6,33 @@
 
 const dunston = { lat: 53.1470222, lng: -0.4106133 };
 
-let map = undefined;
+let mymap = undefined;
 
 function reqListener() {
+  var goodIcon = L.icon({
+    iconUrl: 'good.png',
+    iconSize: [38, 38],
+    iconAnchor: [30, 30],
+    popupAnchor: [-10, -30],
+  });
+  var badIcon = L.icon({
+    iconUrl: 'bad.png',
+    iconSize: [38, 38],
+    iconAnchor: [30, 30],
+    popupAnchor: [-10, -30],
+  });
   let mapdata = JSON.parse(this.responseText);
-
-  console.log(mapdata);
 
   for (var address in mapdata) {
     console.log('adding map location', mapdata[address]);
 
-    const position = {
-      lng: Number(mapdata[address].addressData.Longitude),
-      lat: Number(mapdata[address].addressData.Latitude),
-    };
-
-    let icon = 'no.png';
-
-    if (mapdata[address].hasFullFibre) {
-      icon = 'yes.png';
-    }
-
-    const marker = new google.maps.Marker({
-      position: position,
-      map: map,
-      title: mapdata[address].addressLine,
+    const status = mapdata[address].status;
+    const geolocation = mapdata[address].geolocation;
+    const icon = status === 'Available to order now' ? goodIcon : badIcon;
+    var marker = L.marker([geolocation.Latitude, geolocation.Longitude], {
       icon,
-    });
+    }).addTo(mymap);
+    marker.bindPopup(status).openPopup();
   }
 }
 
@@ -42,7 +42,7 @@ function initMap() {
   const longitude = dunston.lng;
   const zoom = 15;
 
-  var mymap = L.map('mapWrap').setView([latitude, longitude], zoom);
+  mymap = L.map('mapWrap').setView([latitude, longitude], zoom);
 
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png?{foo}', {
     foo: 'bar',
@@ -50,10 +50,6 @@ function initMap() {
       '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
   }).addTo(mymap);
 
-  var marker = L.marker([latitude, longitude]).addTo(mymap);
-  marker
-    .bindPopup('Latitude: ' + latitude + '<br>Longitude: ' + longitude)
-    .openPopup();
   // The marker, positioned at Uluru
 
   var oReq = new XMLHttpRequest();
