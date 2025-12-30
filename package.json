@@ -15,7 +15,7 @@
     "format:check": "prettier --check src/**/*.ts",
     "type-check": "tsc --noEmit",
     "clean": "rm -rf dist",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "keywords": [
     "typescript",
@@ -27,6 +27,7 @@
   "license": "MIT",
   "devDependencies": {
     "@eslint/js": "^9.35.0",
+    "@types/jest": "^30.0.0",
     "@types/node": "^24.4.0",
     "@typescript-eslint/eslint-plugin": "^8.43.0",
     "@typescript-eslint/parser": "^8.43.0",
@@ -34,6 +35,7 @@
     "eslint": "^9.35.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
+    "jest": "^30.2.0",
     "prettier": "^3.6.2",
     "typescript": "^5.9.2"
   },
