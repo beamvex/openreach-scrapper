@@ -56,14 +56,14 @@ resource "aws_iam_role_policy" "scheduler" {
 }
 
 resource "aws_scheduler_schedule" "openreach_scrapper" {
-  name       = "openreach-scrapper-schedule"
+  name                = "openreach-scrapper-schedule"
   schedule_expression = "rate(3 hours)"
-  
+
   flexible_time_window {
-    mode = "FLEXIBLE"
+    mode                      = "FLEXIBLE"
     maximum_window_in_minutes = 10
   }
-  
+
   target {
     arn      = aws_ecs_cluster.main.arn
     role_arn = aws_iam_role.scheduler.arn
@@ -80,18 +80,18 @@ resource "aws_scheduler_schedule" "openreach_scrapper" {
       }
     }
   }
-  
+
   state = "ENABLED"
 }
 
 
 
 output "scheduler_schedule_name" {
-  value = aws_scheduler_schedule.openreach_scrapper.name
+  value       = aws_scheduler_schedule.openreach_scrapper.name
   description = "The name of the scheduler schedule"
 }
 
 output "scheduler_schedule_arn" {
-  value = aws_scheduler_schedule.openreach_scrapper.arn
+  value       = aws_scheduler_schedule.openreach_scrapper.arn
   description = "The ARN of the scheduler schedule"
 }
