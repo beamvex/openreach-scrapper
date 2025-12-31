@@ -32,6 +32,13 @@ resource "aws_s3_bucket_policy" "openreach" {
 }
 
 locals {
+  asset_mime_types = {
+    "css"  = "text/css"
+    "html" = "text/html"
+    "js"   = "text/javascript"
+    "png"  = "image/png"
+  }
+
   asset_files = setunion(
     fileset("${path.module}/../assets", "**/*.css"),
     fileset("${path.module}/../assets", "**/*.js"),
@@ -47,6 +54,8 @@ resource "aws_s3_object" "assets" {
   key    = "${each.value}"
   source = "${path.module}/../assets/${each.value}"
   etag   = filemd5("${path.module}/../assets/${each.value}")
+
+  content_type = lookup(local.asset_mime_types, lower(element(split(".", each.value), length(split(".", each.value)) - 1)), "application/octet-stream")
 }
 
 resource "aws_s3_bucket_notification" "openreach_sns_notifications" {
