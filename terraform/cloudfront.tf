@@ -2,6 +2,10 @@ data "aws_cloudfront_cache_policy" "caching_optimized" {
   name = "Managed-CachingOptimized"
 }
 
+data "aws_cloudfront_cache_policy" "caching_disabled" {
+  name = "Managed-CachingDisabled"
+}
+
 resource "aws_cloudfront_origin_access_control" "openreach" {
   name                              = "openreach-scrapper-oac"
   description                       = "OAC for openreach-scrapper S3 origin"
@@ -18,6 +22,18 @@ resource "aws_cloudfront_distribution" "openreach" {
     domain_name              = aws_s3_bucket.openreach.bucket_regional_domain_name
     origin_id                = "s3-${aws_s3_bucket.openreach.bucket}"
     origin_access_control_id = aws_cloudfront_origin_access_control.openreach.id
+  }
+
+  ordered_cache_behavior {
+    path_pattern           = "/results.json"
+    target_origin_id       = "s3-${aws_s3_bucket.openreach.bucket}"
+    viewer_protocol_policy = "redirect-to-https"
+
+    allowed_methods = ["GET", "HEAD"]
+    cached_methods  = ["GET", "HEAD"]
+    compress        = true
+
+    cache_policy_id = data.aws_cloudfront_cache_policy.caching_disabled.id
   }
 
   default_cache_behavior {
