@@ -1,4 +1,5 @@
 const esbuild = require('esbuild');
+const path = require('path');
 
 const buildOptions = {
   entryPoints: ['src/index.ts', 'src/lambda/processresults/index.ts'],
@@ -10,6 +11,9 @@ const buildOptions = {
   sourcemap: true,
   minify: true,
   external: ['playwright', 'playwright-core'], // exclude playwright modules from bundle to avoid resolution issues
+  alias: {
+    '@': path.resolve(__dirname, 'src'),
+  },
 };
 
 async function build() {

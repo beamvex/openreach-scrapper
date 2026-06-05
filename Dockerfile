@@ -1,7 +1,8 @@
-FROM lscr.io/linuxserver/webtop:debian-xfce 
+FROM debian:trixie 
 
 RUN apt-get update
-RUN apt-get install -y net-tools inetutils-tools inetutils-ping nano unzip gpg wget
+RUN apt-get install -y net-tools inetutils-tools inetutils-ping nano unzip gpg wget xvfb chromium
+RUN apt-get install -y curl
 
 RUN mv /usr/bin/chromium /usr/bin/og-chromium 
 
@@ -13,7 +14,7 @@ COPY root/ /
 
 RUN chmod +x /usr/bin/chromium
 
-RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
+RUN curl -fsSL https://deb.nodesource.com/setup_24.x | bash -
 RUN apt-get install -y nodejs
 
 WORKDIR /app
@@ -32,5 +33,5 @@ RUN npm install
 
 RUN npm run build
 
-CMD ["bash","/app/runscript.sh"]
+CMD ["bash"]
 
