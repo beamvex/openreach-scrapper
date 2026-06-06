@@ -28,11 +28,15 @@ function reqListener() {
 
     const status = mapdata[address].status;
     const geolocation = mapdata[address].geolocation;
+    const postcode = mapdata[address].timeAndLocation?.postcode ?? address;
+    const timestampRaw = mapdata[address].timeAndLocation?.time;
+    const timestamp = timestampRaw ? new Date(timestampRaw).toLocaleString() : '';
     const icon = status === 'Available to order now' ? goodIcon : badIcon;
     var marker = L.marker([geolocation.Latitude, geolocation.Longitude], {
       icon,
     }).addTo(mymap);
-    marker.bindPopup(status).openPopup();
+    marker.bindTooltip(`${postcode}<br/>${timestamp}<br/>${status}`);
+    marker.bindPopup(`${postcode}<br/>${timestamp}<br/>${status}`).openPopup();
   }
 }
 
@@ -54,7 +58,7 @@ function initMap() {
 
   var oReq = new XMLHttpRequest();
   oReq.addEventListener('load', reqListener);
-  oReq.open('GET', 'results.json');
+  oReq.open('GET', `results.json?cb=${Date.now()}`);
   oReq.send();
 }
 
