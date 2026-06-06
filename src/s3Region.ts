@@ -6,6 +6,11 @@ import {
 } from '@aws-sdk/client-s3';
 import fs from 'fs';
 
+export interface S3ObjectInfo {
+  key: string;
+  lastModified?: Date;
+}
+
 const s3Region = process.env.S3_REGION ?? process.env.AWS_REGION;
 const s3Bucket = process.env.S3_BUCKET_NAME;
 const s3Client = s3Region ? new S3Client({ region: s3Region }) : undefined;
@@ -46,7 +51,7 @@ export async function uploadToS3(key: string, filePath: string): Promise<void> {
   await s3Client.send(command);
 }
 
-export async function listS3Objects(prefix: string): Promise<Array<string>> {
+export async function listS3Objects(prefix: string): Promise<Array<S3ObjectInfo>> {
   if (!s3Bucket) {
     throw new Error('S3_BUCKET_NAME environment variable is not set');
   }
@@ -62,9 +67,13 @@ export async function listS3Objects(prefix: string): Promise<Array<string>> {
   );
 
   return (
-    response.Contents?.map(item => item.Key).filter(
-      (key): key is string => typeof key === 'string'
-    ) ?? []
+    response.Contents?.filter(
+      (item): item is { Key: string; LastModified?: Date } =>
+        typeof item.Key === 'string'
+    ).map(item => ({
+      key: item.Key,
+      lastModified: item.LastModified,
+    })) ?? []
   );
 }
 

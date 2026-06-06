@@ -31,18 +31,10 @@ export function parseS3Key(key: string): s3Parts {
   };
 }
 
-export function convertS3KeyToTimeAndLocation(parts: s3Parts): timeAndLocation {
+export function convertS3KeyToTimeAndLocation(parts: s3Parts, lastModified: Date): timeAndLocation {
   return {
     key: parts.key,
-    time: new Date(
-      parseInt(parts.year ?? '0'),
-      parseInt(parts.month ?? '0') - 1,
-      parseInt(parts.day ?? '0'),
-      parseInt(parts.hour ?? '0'),
-      parseInt(parts.minute ?? '0'),
-      parseInt(parts.second ?? '0'),
-      parseInt(parts.millisecond ?? '0')
-    ),
+    time: lastModified,
     postcode: `${parts.postcode1} ${parts.postcode2}`,
   };
 }

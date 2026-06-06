@@ -30,10 +30,10 @@ export const handler = async (event: unknown): Promise<void> => {
   > = {};
 
   files
-    .filter((file): file is string => file.endsWith('.html'))
+    .filter(file => file.key.endsWith('.html'))
     .map(file => {
-      const parsed = parseS3Key(file);
-      return convertS3KeyToTimeAndLocation(parsed);
+      const parsed = parseS3Key(file.key);
+      return convertS3KeyToTimeAndLocation(parsed, file.lastModified ?? new Date());
     })
     .forEach(result => {
       if (!results[result.postcode]) {
