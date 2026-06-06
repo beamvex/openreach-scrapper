@@ -33,5 +33,5 @@ RUN npm install
 
 RUN npm run build
 
-CMD ["bash"]
+CMD ["bash", "./runscript.sh"]
 
