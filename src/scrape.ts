@@ -63,7 +63,7 @@ export const openPage = async (url: string): Promise<void> => {
     await clickButton(page, { textContent: 'Check availability' });
 
     // wait for ctrlc
-    await page.waitForTimeout(1000);
+    await page.waitForTimeout(5000);
 
     const text = await getElementText(page, { selector: 'span', className: 'address-details append-persistent-address' });
     console.log('Text: ', text);
@@ -76,12 +76,6 @@ export const openPage = async (url: string): Promise<void> => {
     //fs.writeFileSync(`/tmp/openreach/${safeName}-${timestamp}.html`, html);
 
     await uploadHtmlToS3(`openreach/${safeName}.html`, html);
-
-    if (process.env.NODE_ENV === 'development') {
-      console.log('Waiting for 1 minute');
-      // Wait a bit to see the page
-      await page.waitForTimeout(1 * 60 * 1000);
-    }
 
     fs.mkdirSync(`/tmp/config/openreach`, { recursive: true });
 
@@ -97,6 +91,12 @@ export const openPage = async (url: string): Promise<void> => {
       `/tmp/config/openreach/${safeName}.png`
     );
     console.log('Screenshot uploaded to S3');
+
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Waiting for 1 minute');
+      // Wait a bit to see the page
+      await page.waitForTimeout(1 * 60 * 1000);
+    }
 
   } finally {
     await browser.close();
