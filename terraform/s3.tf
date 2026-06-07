@@ -1,7 +1,12 @@
 resource "aws_s3_bucket" "openreach" {
   bucket = "openreach-scrapper"
-  versioning {
-    enabled = true
+}
+
+resource "aws_s3_bucket_versioning" "openreach" {
+  bucket = aws_s3_bucket.openreach.id
+
+  versioning_configuration {
+    status = "Enabled"
   }
 }
 
