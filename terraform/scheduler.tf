@@ -57,7 +57,7 @@ resource "aws_iam_role_policy" "scheduler" {
 
 resource "aws_scheduler_schedule" "openreach_scrapper" {
   name                = "openreach-scrapper-schedule"
-  schedule_expression = "rate(3 hours)"
+  schedule_expression = "rate(60 minutes)"
 
   flexible_time_window {
     mode                      = "FLEXIBLE"
