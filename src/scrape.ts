@@ -4,9 +4,18 @@ import { clickButton } from './clickButton';
 import { pickSelect } from './pickSelect';
 import * as fs from 'fs';
 import { uploadHtmlToS3, uploadToS3 } from './s3Region';
-import { postcodes } from './postcodes';
 import { clickElement } from './clickElement';
 import { getElementText } from './getElementText';
+import { geolocationData } from './geodata';
+
+const postcodes: string[] = Array.from(
+  new Set(
+    (geolocationData.features ?? [])
+      .map(feature => `${feature?.properties?.PCDS ?? ''}`)
+      .map(pc => pc.replace(/\s+/g, '').toUpperCase())
+      .filter(Boolean)
+  )
+);
 
 export const openPage = async (url: string): Promise<void> => {
   console.log('Launching Chromium...');

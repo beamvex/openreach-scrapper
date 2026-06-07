@@ -3,7 +3,11 @@ import { convertS3KeyToTimeAndLocation, parseS3Key } from '@/utils';
 import { timeAndLocation } from '@/utils';
 import { parseResults } from '@/parseResults';
 import { downloadS3Object, uploadHtmlToS3 } from '@/s3Region';
-import { geolocationData } from '@/geolocationdata';
+import { geolocationData } from '@/geodata';
+
+function normalizePostcode(postcode: string): string {
+  return postcode.replace(/\s+/g, '').toUpperCase();
+}
 
 export const handler = async (event: unknown): Promise<void> => {
   console.log('Event: ', JSON.stringify(event, null, 2));
@@ -56,9 +60,21 @@ export const handler = async (event: unknown): Promise<void> => {
   for (const [postcode, result] of Object.entries(results)) {
     console.log(`Postcode: ${postcode}, Time: ${result.timeAndLocation.time}`);
 
-    const geolocation = geolocationData.find(
-      location => location.Postcode === postcode.replace(' ', '')
+    const feature = geolocationData.features.find(
+      f => normalizePostcode(`${f?.properties?.PCDS ?? ''}`) === normalizePostcode(postcode)
     );
+    const coords = feature?.geometry?.coordinates;
+    const geolocation = coords
+      ? {
+          Postcode: normalizePostcode(postcode),
+          Description: '',
+          'Grid Reference': '',
+          'X (easting)': 0,
+          'Y (northing)': 0,
+          Latitude: coords[1],
+          Longitude: coords[0],
+        }
+      : undefined;
     const html = await downloadS3Object(result.timeAndLocation.key);
 
     const status = await parseResults(html);
