@@ -40,6 +40,10 @@ export const handler = async (event: unknown): Promise<void> => {
       return convertS3KeyToTimeAndLocation(parsed, file.lastModified ?? new Date());
     })
     .forEach(result => {
+      if (result.postcode === 'undefined undefined') {
+        console.error(`Invalid postcode: ${result.postcode}`);
+        return;
+      }
       if (!results[result.postcode]) {
         results[result.postcode] = {
           timeAndLocation: result,

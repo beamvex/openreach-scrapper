@@ -10,13 +10,25 @@ let mymap = undefined;
 
 function reqListener() {
   var goodIcon = L.icon({
-    iconUrl: 'good.png',
+    iconUrl: 'star-3.png',
+    iconSize: [38, 38],
+    iconAnchor: [30, 30],
+    popupAnchor: [-10, -30],
+  });
+  var buildingIcon = L.icon({
+    iconUrl: 'yoga.png',
+    iconSize: [38, 38],
+    iconAnchor: [30, 30],
+    popupAnchor: [-10, -30],
+  });
+  var planningNextYearIcon = L.icon({
+    iconUrl: 'postal.png',
     iconSize: [38, 38],
     iconAnchor: [30, 30],
     popupAnchor: [-10, -30],
   });
   var badIcon = L.icon({
-    iconUrl: 'bad.png',
+    iconUrl: 'skull.png',
     iconSize: [38, 38],
     iconAnchor: [30, 30],
     popupAnchor: [-10, -30],
@@ -31,7 +43,8 @@ function reqListener() {
     const postcode = mapdata[address].timeAndLocation?.postcode ?? address;
     const timestampRaw = mapdata[address].timeAndLocation?.time;
     const timestamp = timestampRaw ? new Date(timestampRaw).toLocaleString() : '';
-    const icon = status === 'Available to order now' ? goodIcon : badIcon;
+    const icon = status === 'Available to order now' ? goodIcon : status === 'We’ll be building in this area in the next year' ? buildingIcon :
+      status == "We're planning to build in this area" ? planningNextYearIcon : badIcon;
     var marker = L.marker([geolocation.Latitude, geolocation.Longitude], {
       icon,
     }).addTo(mymap);
