@@ -57,3 +57,13 @@ resource "aws_cloudfront_distribution" "openreach" {
     cloudfront_default_certificate = true
   }
 }
+
+action "aws_cloudfront_create_invalidation" "openreach_all" {
+  config {
+    distribution_id = aws_cloudfront_distribution.openreach.id
+    paths           = ["/*"]
+
+    # Forces a new invalidation on every apply
+    caller_reference = timestamp()
+  }
+}
