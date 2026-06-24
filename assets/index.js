@@ -49,7 +49,7 @@ function reqListener() {
     const postcode = mapdata[address].timeAndLocation?.postcode ?? address;
     const timestampRaw = mapdata[address].timeAndLocation?.time;
     const timestamp = timestampRaw ? new Date(timestampRaw).toLocaleString() : '';
-    const icon = status === 'Available to order now' ? goodIcon : status === "We'll be building in this area in the next year" ? buildingIcon :
+    const icon = status === 'Available to order now' ? goodIcon : status.endsWith("building in this area in the next year") ? buildingIcon :
       status == "We're planning to build in this area" ? planningNextYearIcon : 
       status == "We're building in this area now" ? buildingInProgressIcon :badIcon;
     var marker = L.marker([geolocation.Latitude, geolocation.Longitude], {
