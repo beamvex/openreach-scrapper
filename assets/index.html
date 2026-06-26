@@ -24,9 +24,13 @@
      and consistent behavior across browsers, consider loading using Promises
      with https://www.npmjs.com/package/@googlemaps/js-api-loader.
     -->
-    <div style="width: 100%; height: 1000px;">
-        <div id="mapWrap" style="width: 100%; height: 1000px;"></div>
+    <div id="appHeader">
+        <div id="appHeaderTitle">Openreach Scrapper</div>
+        <form id="postcodeSearchForm" autocomplete="off">
+            <input id="postcodeSearchInput" type="search" placeholder="Search postcode" aria-label="Search postcode" />
+        </form>
     </div>
+    <div id="mapWrap"></div>
     
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script type="text/javascript" src="index.js?cb=2"></script>

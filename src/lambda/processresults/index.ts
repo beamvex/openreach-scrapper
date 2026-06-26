@@ -125,10 +125,29 @@ async function notifyIfChanged(
     return;
   }
 
+  const subject = (() => {
+    const sanitize = (value: string): string => value.replace(/[\r\n]+/g, ' ').slice(0, 80);
+    const summary = (change: (typeof changes)[number]): string => {
+      const fromStatus = sanitize(change.from?.status ?? '');
+      const toStatus = sanitize(change.to?.status ?? '');
+      const postcode = sanitize(change.postcode);
+      return `${postcode} ${fromStatus} -> ${toStatus}`.trim();
+    };
+
+    if (changes.length === 1) {
+      return `openreach-scrapper: ${summary(changes[0])}`.slice(0, 100);
+    }
+
+    return `openreach-scrapper: ${changes.length} changes (e.g. ${summary(changes[0])})`.slice(
+      0,
+      100
+    );
+  })();
+
   await sns.send(
     new PublishCommand({
       TopicArn: topicArn,
-      Subject: `openreach-scrapper: ${changes.length} changes detected`,
+      Subject: subject,
       Message: JSON.stringify(
         {
           changes,
