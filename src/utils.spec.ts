@@ -26,7 +26,8 @@ describe('utils', () => {
   });
 
   it('converts', () => {
-    const timeAndLocation = convertS3KeyToTimeAndLocation({
+    const timeAndLocation = convertS3KeyToTimeAndLocation(
+      {
       key: 'openreach/1_Back_Lane_Dunston_Lincoln_LN4_2EH_United_Kingdom-2025-12-23T16-18-34-587Z.html',
       street: '1_Back_Lane_Dunston_Lincoln',
       postcode1: 'LN4',
@@ -40,7 +41,9 @@ describe('utils', () => {
       minute: '18',
       second: '34',
       millisecond: '587',
-    });
+      },
+      new Date('2025-12-23T16:18:34.587Z')
+    );
     expect(timeAndLocation).toBeDefined();
     expect(timeAndLocation).toMatchObject({
       key: 'openreach/1_Back_Lane_Dunston_Lincoln_LN4_2EH_United_Kingdom-2025-12-23T16-18-34-587Z.html',

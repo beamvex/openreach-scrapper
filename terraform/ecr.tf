@@ -1,6 +1,8 @@
 provider "aws" {
   region = "eu-west-2"
 
+  profile = "512752756525_AdministratorAccess"
+
 }
 
 resource "aws_ecr_repository" "openreach_scrapper" {

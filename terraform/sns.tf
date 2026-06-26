@@ -2,6 +2,10 @@ resource "aws_sns_topic" "openreach_scrapper" {
   name = "openreach-scrapper-sns-topic"
 }
 
+resource "aws_sns_topic" "openreach_address_change" {
+  name = "openreach-scrapper-address-change"
+}
+
 resource "aws_sns_topic_policy" "openreach_scrapper_allow_s3" {
   arn = aws_sns_topic.openreach_scrapper.arn
 

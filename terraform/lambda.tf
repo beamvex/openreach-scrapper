@@ -23,12 +23,14 @@ resource "aws_lambda_function" "process_results" {
   role             = aws_iam_role.lambda.arn
   handler          = "index.handler"
   runtime          = "nodejs18.x"
-  timeout = 60
+  timeout          = 60
   filename         = data.archive_file.lambda.output_path
   source_code_hash = data.archive_file.lambda.output_base64sha256
   environment {
     variables = {
-      S3_BUCKET_NAME = "openreach-scrapper"
+      S3_BUCKET_NAME           = "openreach-scrapper"
+      SNS_REGION               = var.aws_region
+      ADDRESS_CHANGE_TOPIC_ARN = aws_sns_topic.openreach_address_change.arn
     }
   }
 }
@@ -53,10 +55,26 @@ resource "aws_iam_role" "lambda" {
 
 resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
   role       = aws_iam_role.lambda.name
-  policy_arn  = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_s3_full_access" {
   role       = aws_iam_role.lambda.name
-  policy_arn  = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+  policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+}
+
+resource "aws_iam_role_policy" "lambda_publish_address_changes" {
+  name = "openreach-scrapper-process-results-sns-publish"
+  role = aws_iam_role.lambda.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = ["sns:Publish"]
+        Resource = aws_sns_topic.openreach_address_change.arn
+      }
+    ]
+  })
 }
