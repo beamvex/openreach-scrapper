@@ -39,6 +39,13 @@ function reqListener() {
     iconAnchor: [30, 30],
     popupAnchor: [-10, -30],
   });
+  var notQueriedIcon = L.icon({
+    iconUrl: '3d.png',
+    iconSize: [38, 38],
+    iconAnchor: [30, 30],
+    popupAnchor: [-10, -30],
+  });
+  
   let mapdata = JSON.parse(this.responseText);
 
   for (var address in mapdata) {
@@ -51,7 +58,8 @@ function reqListener() {
     const timestamp = timestampRaw ? new Date(timestampRaw).toLocaleString() : '';
     const icon = status === 'Available to order now' ? goodIcon : status.endsWith("building in this area in the next year") ? buildingIcon :
       status == "We're planning to build in this area" ? planningNextYearIcon : 
-      status == "We're building in this area now" ? buildingInProgressIcon :badIcon;
+      status == "We're building in this area now" ? buildingInProgressIcon :
+      status == "not_queried_yet" ? notQueriedIcon : badIcon;
     var marker = L.marker([geolocation.Latitude, geolocation.Longitude], {
       icon,
     }).addTo(mymap);
