@@ -18,7 +18,7 @@ resource "null_resource" "build_and_push_image" {
     command = <<EOT
 npm run build
 
-aws ecr get-login-password --region eu-west-2 \
+aws ecr get-login-password --region eu-west-2 --profile 512752756525_AdministratorAccess \
   | docker login --username AWS --password-stdin ${aws_ecr_repository.openreach_scrapper.repository_url}
 
 DOCKER_BUILDKIT=1 docker build --platform linux/amd64 --provenance=false -t openreach-scrapper ..
