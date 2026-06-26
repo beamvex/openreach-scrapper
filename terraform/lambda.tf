@@ -22,7 +22,7 @@ resource "aws_lambda_function" "process_results" {
   function_name    = "openreach-scrapper-process-results"
   role             = aws_iam_role.lambda.arn
   handler          = "index.handler"
-  runtime          = "nodejs18.x"
+  runtime          = "nodejs24.x"
   timeout          = 300
   filename         = data.archive_file.lambda.output_path
   source_code_hash = data.archive_file.lambda.output_base64sha256

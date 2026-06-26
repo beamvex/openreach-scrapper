@@ -3,7 +3,7 @@ import { fillInput } from './fillInput';
 import { clickButton } from './clickButton';
 import { pickSelect } from './pickSelect';
 import * as fs from 'fs';
-import { uploadHtmlToS3, uploadToS3 } from './s3Region';
+import { downloadS3Object, uploadHtmlToS3, uploadToS3 } from './s3Region';
 import { clickElement } from './clickElement';
 import { getElementText } from './getElementText';
 import { geolocationData } from './geodata';
@@ -16,6 +16,92 @@ const postcodes: string[] = Array.from(
       .filter(Boolean)
   )
 );
+
+function normalizePostcode(postcode: string): string {
+  return postcode.replace(/\s+/g, '').toUpperCase();
+}
+
+function formatPostcode(postcode: string): string {
+  const normalized = normalizePostcode(postcode);
+  if (normalized.length <= 3) {
+    return normalized;
+  }
+  return `${normalized.slice(0, -3)} ${normalized.slice(-3)}`;
+}
+
+type ResultsEntry = {
+  status?: string;
+  queried?: boolean;
+  timeAndLocation?: {
+    time?: string;
+  };
+};
+
+function parseResultsJson(json: string): Record<string, ResultsEntry> {
+  if (!json) {
+    return {};
+  }
+  try {
+    const parsed = JSON.parse(json) as Record<string, ResultsEntry>;
+    return parsed ?? {};
+  } catch (err) {
+    console.warn('Failed to parse results.json; falling back to random postcode', err);
+    return {};
+  }
+}
+
+async function selectTargetPostcode(): Promise<string> {
+  const resultsJson = await downloadS3Object('results.json');
+  const resultsByPostcode = parseResultsJson(resultsJson);
+
+  const resultsByNormalized = new Map<string, ResultsEntry>();
+  for (const [postcodeKey, entry] of Object.entries(resultsByPostcode)) {
+    resultsByNormalized.set(normalizePostcode(postcodeKey), entry);
+  }
+
+  const now = Date.now();
+  const weekMs = 7 * 24 * 60 * 60 * 1000;
+
+  const notAvailablePostcodes = postcodes.filter(pc => {
+    const entry = resultsByNormalized.get(normalizePostcode(pc));
+    const status = entry?.status ?? '';
+    return status !== 'Available to order now';
+  });
+
+  const notQueried = notAvailablePostcodes.filter(pc => {
+    const entry = resultsByNormalized.get(normalizePostcode(pc));
+    return entry?.queried === false || entry?.status === 'not_queried_yet';
+  });
+
+  if (notQueried.length > 0) {
+    return formatPostcode(notQueried[Math.floor(Math.random() * notQueried.length)]);
+  }
+
+  const stale = notAvailablePostcodes.filter(pc => {
+    const entry = resultsByNormalized.get(normalizePostcode(pc));
+    const lastTime = entry?.timeAndLocation?.time;
+    if (!lastTime) {
+      return false;
+    }
+    const lastMs = new Date(lastTime).getTime();
+    if (Number.isNaN(lastMs)) {
+      return false;
+    }
+    return now - lastMs > weekMs;
+  });
+
+  if (stale.length > 0) {
+    return formatPostcode(stale[Math.floor(Math.random() * stale.length)]);
+  }
+
+  if (notAvailablePostcodes.length > 0) {
+    return formatPostcode(
+      notAvailablePostcodes[Math.floor(Math.random() * notAvailablePostcodes.length)]
+    );
+  }
+
+  return formatPostcode(postcodes[Math.floor(Math.random() * postcodes.length)]);
+}
 
 export const openPage = async (url: string): Promise<void> => {
   console.log('Launching Chromium...');
@@ -42,10 +128,11 @@ export const openPage = async (url: string): Promise<void> => {
     await page.waitForTimeout(2000);
 
     console.log('Filling input postcode');
+    const targetPostcode = await selectTargetPostcode();
     await fillInput(
       page,
       { type: 'text', className: 'postcode-checker__input' },
-      postcodes[Math.floor(Math.random() * postcodes.length)]
+      targetPostcode
     );
 
     console.log('Clicking button check postcode');
