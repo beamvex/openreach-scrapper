@@ -65,7 +65,7 @@ async function selectTargetPostcode(): Promise<string> {
   const notAvailablePostcodes = postcodes.filter(pc => {
     const entry = resultsByNormalized.get(normalizePostcode(pc));
     const status = entry?.status ?? '';
-    return status !== 'Available to order now';
+    return status !== 'Available to order now' && status !== 'invalid_postcode';
   });
 
   const notQueried = notAvailablePostcodes.filter(pc => {
@@ -129,6 +129,10 @@ export const openPage = async (url: string): Promise<void> => {
 
     console.log('Filling input postcode');
     const targetPostcode = await selectTargetPostcode();
+    const normalizedPostcode = normalizePostcode(targetPostcode);
+    const postcode1 = normalizedPostcode.slice(0, Math.max(0, normalizedPostcode.length - 3));
+    const postcode2 = normalizedPostcode.slice(-3);
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
     await fillInput(
       page,
       { type: 'text', className: 'postcode-checker__input' },
@@ -142,50 +146,55 @@ export const openPage = async (url: string): Promise<void> => {
     // Wait a bit to see the page
     await page.waitForTimeout(2500);
 
-    // press down arrow to select the first option
-    await clickElement(page, { className: 'selector-container rd-dropdown-arrow' });
+    let invalid = false;
 
-    console.log('Waiting for 1 second');
-    // Wait a bit to see the page
-    await page.waitForTimeout(1000);
+    try {
+      // press down arrow to select the first option
+      await clickElement(page, { className: 'selector-container rd-dropdown-arrow' });
 
-    await clickElement(page, { selector: 'div', className: 'option-text' });
+      console.log('Waiting for 1 second');
+      // Wait a bit to see the page
+      await page.waitForTimeout(1000);
 
-    console.log('Waiting for 1 second');
-    // Wait a bit to see the page
-    await page.waitForTimeout(1000);
+      await clickElement(page, { selector: 'div', className: 'option-text' });
 
+      console.log('Waiting for 1 second');
+      // Wait a bit to see the page
+      await page.waitForTimeout(1000);
 
-    await clickButton(page, { textContent: 'Check availability' });
+      await clickButton(page, { textContent: 'Check availability' });
 
-    // wait for ctrlc
-    await page.waitForTimeout(5000);
+      // wait for ctrlc
+      await page.waitForTimeout(5000);
+    } catch (err) {
+      console.warn('Failed to select address / check availability; marking as invalid postcode', err);
+      invalid = true;
+    }
 
-    const text = await getElementText(page, { selector: 'span', className: 'address-details append-persistent-address' });
+    const text = invalid
+      ? `invalid_postcode_${normalizedPostcode}`
+      : await getElementText(page, {
+          selector: 'span',
+          className: 'address-details append-persistent-address',
+        });
     console.log('Text: ', text);
 
     const html = await page.content();
 
-    const safeName = `${text.replace(/[^a-zA-Z0-9_-]+/g, '_')}`;
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const baseName = `${postcode1}_${postcode2}_${timestamp}${invalid ? '_invalid' : ''}`;
 
-    //fs.writeFileSync(`/tmp/openreach/${safeName}-${timestamp}.html`, html);
-
-    await uploadHtmlToS3(`openreach/${safeName}.html`, html);
+    await uploadHtmlToS3(`openreach/${baseName}.html`, html);
 
     fs.mkdirSync(`/tmp/config/openreach`, { recursive: true });
 
     await page.screenshot({
-      path: `/tmp/config/openreach/${safeName}.png`,
+      path: `/tmp/config/openreach/${baseName}.png`,
     });
 
     console.log('Screenshot taken');
-    const pngKey = `openreach/${safeName}.png`;
+    const pngKey = `openreach/${baseName}.png`;
 
-    await uploadToS3(
-      pngKey,
-      `/tmp/config/openreach/${safeName}.png`
-    );
+    await uploadToS3(pngKey, `/tmp/config/openreach/${baseName}.png`);
     console.log('Screenshot uploaded to S3');
 
     if (process.env.NODE_ENV === 'development') {

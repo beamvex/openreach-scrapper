@@ -221,6 +221,11 @@ export const handler = async (event: unknown): Promise<void> => {
       continue;
     }
 
+    if (result.timeAndLocation.key.includes('_invalid.html')) {
+      result.status = 'invalid_postcode';
+      continue;
+    }
+
     const html = await downloadS3Object(result.timeAndLocation.key);
     const status = await parseResults(html);
     console.log(`Status: ${status}`);

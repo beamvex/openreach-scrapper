@@ -21,9 +21,12 @@ export interface timeAndLocation {
 }
 
 export function parseS3Key(key: string): s3Parts {
-  const regex =
-    /openreach\/(?<street>[^/]+)_(?<postcode1>[^/]+)_(?<postcode2>[^/]+)\.html/;
-  const match = key.match(regex);
+  const newFormat =
+    /openreach\/(?<postcode1>[^_/.]+)_(?<postcode2>[^_/.]+)_(?<timestamp>[^/.]+?)(?:_invalid)?\.html$/;
+  const oldFormat =
+    /openreach\/(?<street>[^/]+)_(?<postcode1>[^/]+)_(?<postcode2>[^/]+)\.html$/;
+
+  const match = key.match(newFormat) ?? key.match(oldFormat);
 
   return {
     key,
