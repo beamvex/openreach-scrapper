@@ -141,7 +141,7 @@ function reqListener() {
     const status = mapdata[address].status;
     const bucket = getLegendBucket(status);
     counts[bucket] = (counts[bucket] ?? 0) + 1;
-    const geolocation = mapdata[address].geolocation;
+    const geolocation = mapdata[address].geolocation || { Latitude: 51.5074, Longitude: -0.1278 };
     const postcode = mapdata[address].timeAndLocation?.postcode ?? address;
     const postcodeKey = normalizePostcode(postcode);
     const timestampRaw = mapdata[address].timeAndLocation?.time;
