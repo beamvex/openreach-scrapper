@@ -230,6 +230,9 @@ export const handler = async (event: unknown): Promise<void> => {
     const status = await parseResults(html);
     console.log(`Status: ${status}`);
     result.status = status;
+    if (!status) {
+      result.queried = false;
+    }
   }
 
   await notifyIfChanged(oldResults, results);
