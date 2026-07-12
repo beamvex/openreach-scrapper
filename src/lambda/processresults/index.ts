@@ -200,6 +200,13 @@ export const handler = async (event: unknown): Promise<void> => {
       }
     });
 
+  // Merge old results to preserve entries for postcodes without current S3 files
+  for (const [postcode, entry] of Object.entries(oldResults)) {
+    if (!results[postcode]) {
+      results[postcode] = entry;
+    }
+  }
+
   for (const postcode of getAllPostcodes()) {
     const formatted = formatPostcode(postcode);
     if (!results[formatted]) {
