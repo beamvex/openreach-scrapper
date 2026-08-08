@@ -13,6 +13,10 @@ provider "aws" {
 
 resource "aws_ecr_repository" "openreach_scrapper" {
   name = "openreach-scrapper"
+
+  tags = {
+    Name = "ecr repository"
+  }
 }
 
 resource "null_resource" "build_and_push_image" {

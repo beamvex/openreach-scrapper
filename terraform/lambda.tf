@@ -26,6 +26,11 @@ resource "aws_lambda_function" "process_results" {
   timeout          = 300
   filename         = data.archive_file.lambda.output_path
   source_code_hash = data.archive_file.lambda.output_base64sha256
+
+  tags = {
+    Name = "lambda function"
+  }
+
   environment {
     variables = {
       S3_BUCKET_NAME           = "openreach-scrapper"
@@ -38,6 +43,10 @@ resource "aws_lambda_function" "process_results" {
 
 resource "aws_iam_role" "lambda" {
   name = "openreach-scrapper-process-results-role"
+
+  tags = {
+    Name = "iam role"
+  }
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"

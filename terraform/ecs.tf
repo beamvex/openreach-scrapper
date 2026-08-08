@@ -1,6 +1,10 @@
 resource "aws_ecs_cluster" "main" {
   name = "openreach-scrapper-cluster"
 
+  tags = {
+    Name = "ecs cluster"
+  }
+
   setting {
     name  = "containerInsights"
     value = "enabled"
@@ -15,6 +19,10 @@ locals {
 resource "aws_cloudwatch_log_group" "app" {
   name              = local.log_group_name
   retention_in_days = 14
+
+  tags = {
+    Name = "cloudwatch log group"
+  }
 }
 
 resource "aws_ecs_task_definition" "app" {
@@ -63,6 +71,10 @@ resource "aws_ecs_task_definition" "app" {
 resource "aws_iam_role" "ecs_execution" {
   name = "openreach-scrapper-ecs-execution-role"
 
+  tags = {
+    Name = "iam role"
+  }
+
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -84,6 +96,10 @@ resource "aws_iam_role_policy_attachment" "ecs_execution" {
 
 resource "aws_iam_role" "ecs_task" {
   name = "openreach-scrapper-ecs-task-role"
+
+  tags = {
+    Name = "iam role"
+  }
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"

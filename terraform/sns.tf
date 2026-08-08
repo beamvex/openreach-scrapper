@@ -1,9 +1,17 @@
 resource "aws_sns_topic" "openreach_scrapper" {
   name = "openreach-scrapper-sns-topic"
+
+  tags = {
+    Name = "sns topic"
+  }
 }
 
 resource "aws_sns_topic" "openreach_address_change" {
   name = "openreach-scrapper-address-change"
+
+  tags = {
+    Name = "sns topic"
+  }
 }
 
 resource "aws_sns_topic_policy" "openreach_scrapper_allow_s3" {

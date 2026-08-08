@@ -7,6 +7,10 @@ resource "aws_security_group" "openreach-scrapper" {
   description = "Security group for openreach-scrapper application"
   vpc_id      = data.aws_vpc.default.id
 
+  tags = {
+    Name = "security group"
+  }
+
   ingress {
     from_port   = 3001
     to_port     = 3001

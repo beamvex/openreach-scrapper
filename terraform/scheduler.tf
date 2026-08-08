@@ -8,6 +8,10 @@ data "aws_subnets" "default" {
 resource "aws_iam_role" "scheduler" {
   name = "openreach-scrapper-scheduler-role"
 
+  tags = {
+    Name = "iam role"
+  }
+
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [

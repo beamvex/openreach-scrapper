@@ -1,5 +1,9 @@
 resource "aws_s3_bucket" "openreach" {
   bucket = "openreach-scrapper"
+
+  tags = {
+    Name = "s3 bucket"
+  }
 }
 
 resource "aws_s3_bucket_versioning" "openreach" {

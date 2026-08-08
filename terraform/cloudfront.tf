@@ -18,6 +18,10 @@ resource "aws_cloudfront_distribution" "openreach" {
   enabled             = true
   default_root_object = "index.html"
 
+  tags = {
+    Name = "cloudfront distribution"
+  }
+
   origin {
     domain_name              = aws_s3_bucket.openreach.bucket_regional_domain_name
     origin_id                = "s3-${aws_s3_bucket.openreach.bucket}"
