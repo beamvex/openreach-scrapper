@@ -1,8 +1,14 @@
 provider "aws" {
-  region = "eu-west-2"
-
+  region  = "eu-west-2"
   profile = "512752756525_AdministratorAccess"
 
+  default_tags {
+    tags = {
+      Name      = "openreach-scrapper"
+      Project   = "openreach-scrapper"
+      ManagedBy = "terraform"
+    }
+  }
 }
 
 resource "aws_ecr_repository" "openreach_scrapper" {
