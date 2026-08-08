@@ -18,7 +18,7 @@ resource "aws_iam_role" "scheduler" {
       {
         Effect = "Allow"
         Principal = {
-          Service = "scheduler.amazonaws.com"
+          Service = "events.amazonaws.com"
         }
         Action = "sts:AssumeRole"
       }
@@ -59,43 +59,41 @@ resource "aws_iam_role_policy" "scheduler" {
   })
 }
 
-resource "aws_scheduler_schedule" "openreach_scrapper" {
-  name                = "openreach-scrapper-schedule"
+resource "aws_cloudwatch_event_rule" "openreach_scrapper" {
+  name                = "openreach-scrapper-rule"
+  description         = "EventBridge rule to trigger openreach-scrapper ECS task"
   schedule_expression = "rate(60 minutes)"
 
-  flexible_time_window {
-    mode                      = "FLEXIBLE"
-    maximum_window_in_minutes = 10
+  tags = {
+    Name = "event rule"
   }
+}
 
-  target {
-    arn      = aws_ecs_cluster.main.arn
-    role_arn = aws_iam_role.scheduler.arn
+resource "aws_cloudwatch_event_target" "openreach_scrapper" {
+  rule      = aws_cloudwatch_event_rule.openreach_scrapper.name
+  arn       = aws_ecs_cluster.main.arn
+  role_arn  = aws_iam_role.scheduler.arn
+  target_id = "openreach-scrapper"
 
-    ecs_parameters {
-      task_definition_arn = aws_ecs_task_definition.app.arn
-      launch_type         = "FARGATE"
-      platform_version    = "LATEST"
+  ecs_target {
+    task_definition_arn = aws_ecs_task_definition.app.arn
+    launch_type         = "FARGATE"
+    platform_version    = "LATEST"
 
-      network_configuration {
-        subnets          = data.aws_subnets.default.ids
-        security_groups  = [aws_security_group.openreach-scrapper.id]
-        assign_public_ip = true
-      }
+    network_configuration {
+      subnets          = data.aws_subnets.default.ids
+      security_groups  = [aws_security_group.openreach-scrapper.id]
+      assign_public_ip = true
     }
   }
-
-  state = "ENABLED"
 }
 
-
-
-output "scheduler_schedule_name" {
-  value       = aws_scheduler_schedule.openreach_scrapper.name
-  description = "The name of the scheduler schedule"
+output "rule_name" {
+  value       = aws_cloudwatch_event_rule.openreach_scrapper.name
+  description = "The name of the CloudWatch Events rule"
 }
 
-output "scheduler_schedule_arn" {
-  value       = aws_scheduler_schedule.openreach_scrapper.arn
-  description = "The ARN of the scheduler schedule"
+output "rule_arn" {
+  value       = aws_cloudwatch_event_rule.openreach_scrapper.arn
+  description = "The ARN of the CloudWatch Events rule"
 }
